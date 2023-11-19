@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 
-class GameRoom {
+class StartRoom {
 	constructor() {
-		self.scene = new THREE.Scene();
-		self.camera = new THREE.PerspectiveCamera();
+		this.scene = new THREE.Scene();
+		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 	}
 	reset() {
 
@@ -11,7 +11,9 @@ class GameRoom {
 	Step() {
 
 	}
-	Render(renderer) {
-		renderer.render(self.scene, self.camera);
+	Render() {
+
 	}
 }
+
+export default StartRoom;

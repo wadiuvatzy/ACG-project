@@ -1,4 +1,4 @@
-import { GameObject } from 'objects';
+import { GameObject } from '../objects';
 
 const SPIKE_RADIUS = 9;
 
@@ -8,6 +8,8 @@ class Spike extends GameObject {
 		this.initial_position = initial_position.clone();
 		this.attached_to = attached_to;
 		this.size = SPIKE_RADIUS;
+
+		this.reset();
 		// TODO: initialize the 3D object and its tiles.
 	}
 	reset() {
@@ -27,3 +29,5 @@ class Spike extends GameObject {
 		// TODO
 	}
 }
+
+export default Spike;

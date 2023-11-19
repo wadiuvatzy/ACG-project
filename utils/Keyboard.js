@@ -99,3 +99,5 @@ function InitKeyboard() {
 	window.addEventListener('keydown', EventListenerKeyDown);
 	window.addEventListener('keyup', EventListenerKeyUp);
 }
+
+export { InitKeyboard, KeyboardUpdate, getKeyboardValue };

@@ -1,5 +1,7 @@
-import { GameObject, Player } from 'objects';
+import { GameObject } from '../objects';
 import * as THREE from 'three'
+
+export const BLOCK_UNIT_SIZE = 8;
 
 class Block extends GameObject {
 	constructor(gameRoom, initial_position, width, height) {
@@ -7,7 +9,14 @@ class Block extends GameObject {
 		this.initial_position = initial_position.clone(); // left-bottom position
 		this.width = width;
 		this.height = height;
-		// TODO: initialize the 3D object and its tiles.
+
+		this.reset()
+
+		// Initialize the 3D object and its tiles.
+		const geometry = new THREE.BoxGeometry(this.width, this.height, 5 * BLOCK_UNIT_SIZE);
+		const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+		this.box = new THREE.Mesh(geometry, material);
+		this.gameRoom.scene.add(this.box);
 	}
 
 	getUpper(target_position = this.position) { return target_position.y + this.height; }
@@ -20,13 +29,18 @@ class Block extends GameObject {
 		this.velocity = new THREE.Vector2(0, 0);
 	}
 	onStep() {
-
+		this.position.add(this.velocity);
 	}
 	onRender() {
-
+		this.box.position.x = this.position.x + this.width * 0.5;
+		this.box.position.y = this.position.y + this.height * 0.5;
+		this.box.position.z = 0;
 	}
 }
 
 // TODO: add other blocks
 // DropBlock: when the player stands on it, it drops.
 // WeakBlock: breaks after the player touches it / the player dashes to it / a DropBlock drops on it, depending its type.
+
+
+export default Block;
