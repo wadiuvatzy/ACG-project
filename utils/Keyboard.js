@@ -3,13 +3,13 @@
 // Need to call InitKeyboard() in the beginning.
 
 const KeyCodes = {
-	'Reset': 82, // r
-	'Jump': 67, // c
-	'Dash': 88, // x
-	'Left': 37,
-	'Right': 39,
-	'Up': 38,
-	'Down': 39
+	'Reset': 'KeyR', // r
+	'Jump': 'KeyC', // c
+	'Dash': 'KeyX', // x
+	'Left': 'ArrowLeft',
+	'Right': 'ArrowRight',
+	'Up': 'ArrowUp',
+	'Down': 'ArrowDown'
 }
 
 var KeyboardValue = {
@@ -51,46 +51,46 @@ function KeyboardUpdate() {
 }
 
 function EventListenerKeyDown(event) {
-	const keycode = event.keyCode;
-	if (keycode == KeyCodes.Jump) {
+	const code = event.code;
+	if (code == KeyCodes.Jump) {
 		KeyboardValueNew.Jump = true;
 		KeyboardValueNew.JumpPressed = true;
 	}
-	else if (keycode == KeyCodes.Dash) {
+	else if (code == KeyCodes.Dash) {
 		KeyboardValueNew.DashPressed = true;
 	}
-	else if (keycode == KeyCodes.Left) {
+	else if (code == KeyCodes.Left) {
 		KeyboardValueNew.Left = true;
 	}
-	else if (keycode == KeyCodes.Right) {
+	else if (code == KeyCodes.Right) {
 		KeyboardValueNew.Right = true;
 	}
-	else if (keycode == KeyCodes.Up) {
+	else if (code == KeyCodes.Up) {
 		KeyboardValueNew.Up = true;
 	}
-	else if (keycode == KeyCodes.Down) {
+	else if (code == KeyCodes.Down) {
 		KeyboardValueNew.Down = true;
 	}
 }
 
 function EventListenerKeyUp(event) {
-	const keycode = event.keyCode;
-	if (keycode == KeyCodes.Jump) {
+	const code = event.code;
+	if (code == KeyCodes.Jump) {
 		KeyboardValueNew.Jump = false;
 	}
-	else if (keycode == KeyCodes.Dash) {
+	else if (code == KeyCodes.Dash) {
 		// Do nothing.
 	}
-	else if (keycode == KeyCodes.Left) {
+	else if (code == KeyCodes.Left) {
 		KeyboardValueNew.Left = false;
 	}
-	else if (keycode == KeyCodes.Right) {
+	else if (code == KeyCodes.Right) {
 		KeyboardValueNew.Right = false;
 	}
-	else if (keycode == KeyCodes.Up) {
+	else if (code == KeyCodes.Up) {
 		KeyboardValueNew.Up = false;
 	}
-	else if (keycode == KeyCodes.Down) {
+	else if (code == KeyCodes.Down) {
 		KeyboardValueNew.Down = false;
 	}
 }
