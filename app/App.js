@@ -20,14 +20,16 @@ class App {
 	run_debug() {
 		utils.KeyboardUpdate();
 
-		if (this.gameRoomName != this.targetRoomName) {
-			this.gameRoomName = this.targetRoomName;
-			this.gameRoom.init_debug();
-		}
+		// if (this.gameRoomName != this.targetRoomName) {
+		// 	this.gameRoomName = this.targetRoomName;
+		// 	this.gameRoom.init_debug();
+		// }
 		// this.gameRoom.Step();
-		this.gameRoom.Render();
+		// this.gameRoom.Render();
 
-		this.renderer.render(this.gameRoom.scene, this.gameRoom.camera);
+		// this.renderer.render(this.gameRoom.scene, this.gameRoom.camera);
+		this.startRoom.Step();
+		this.renderer.render(this.startRoom.scene, this.startRoom.camera);
 	}
 	run() {
 

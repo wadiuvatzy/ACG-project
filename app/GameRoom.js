@@ -63,7 +63,7 @@ class GameRoom {
 	// Given the time elapsed and keyboard inputs, compute the next state.
 	Step() {
 		var keyboardValue = utils.getKeyboardValue();
-		if (!paused) {
+		if (!this.paused) {
 			for (var block of this.blocks) {
 				block.onStep();
 			}
