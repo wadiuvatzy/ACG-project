@@ -16,6 +16,7 @@ class App {
 		// TODO: load the start room;
 		this.gameRoomName = "No Room";
 		this.targetRoomName = "Debug";
+		this.level = -1;
 	}
 	run_debug() {
 		utils.KeyboardUpdate();
@@ -26,10 +27,20 @@ class App {
 		// }
 		// this.gameRoom.Step();
 		// this.gameRoom.Render();
-
 		// this.renderer.render(this.gameRoom.scene, this.gameRoom.camera);
-		this.startRoom.Step();
-		this.renderer.render(this.startRoom.scene, this.startRoom.camera);
+		if (this.level == -1) {
+			this.level = this.startRoom.Step(); // -1 for start, 0 for level 0, 1 for level 1, etc.
+			this.renderer.render(this.startRoom.scene, this.startRoom.camera);
+		}
+		else{
+			if (this.gameRoomName != this.targetRoomName) {
+				this.gameRoomName = this.targetRoomName;
+				this.gameRoom.init_debug();
+			}
+			this.gameRoom.Step();
+			this.gameRoom.Render();
+			this.renderer.render(this.gameRoom.scene, this.gameRoom.camera);
+		}
 	}
 	run() {
 
