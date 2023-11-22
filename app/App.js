@@ -16,7 +16,7 @@ class App {
 		// TODO: load the start room;
 		this.gameRoomName = "No Room";
 		this.targetRoomName = "Debug";
-		this.level = -1;
+		this.level = 0;
 	}
 	run_debug() {
 		utils.KeyboardUpdate();

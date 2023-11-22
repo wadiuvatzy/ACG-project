@@ -11,13 +11,14 @@ class GameRoom {
 		this.room_width = 0;
 	}
 	init_debug() {
-		// this.player = new game_objects.Player();
+		this.player = new game_objects.Player(this, new THREE.Vector2(0, 20));
 		this.blocks = [];
 		this.spikes = [];
 		this.special_objects = [];
 
 		// add blocks
 		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(0, 0), 16, 20));
+		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(16, 0), 16, 50));
 
 		// add lights
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
@@ -46,7 +47,7 @@ class GameRoom {
 
 	}
 	reset() {
-		// this.player.reset();
+		this.player.reset();
 		for (var block of this.blocks) {
 			block.reset();
 		}
@@ -73,7 +74,7 @@ class GameRoom {
 			for (var obj of this.special_objects) {
 				obj.onStep();
 			}
-			// player.onStep();
+			this.player.onStep();
 		}
 		else {
 			// TODO
@@ -91,7 +92,7 @@ class GameRoom {
 			for (var obj of this.special_objects) {
 				obj.onRender();
 			}
-			// player.onRender();
+			this.player.onRender();
 		}
 		else {
 			// TODO

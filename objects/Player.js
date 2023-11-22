@@ -12,7 +12,7 @@ export const GRAVITY = 0.25;
 const AIRJUMP_TIME_LIMIT = 5;
 const BOOST_TIME_LIMIT = 5;
 const JUMP_BOOST = 40.0 / 60
-const JUMP_SPEED_Y = 2.6;
+const JUMP_SPEED_Y = 2.2;
 
 const FORWARD_SPEED = 1.5;
 const SMALLER_RESISTANCE = 4.3 / 60;
@@ -36,7 +36,8 @@ const DASH_DIRECTION_RIGHT_UP = 7;
 const DASH_DIRECTION_RIGHT_DOWN = 8;
 
 class Player extends GameObject {
-	constructor(gameRoom, initial_position, initial_direction) {
+	
+	constructor(gameRoom, initial_position, initial_direction = DIRECTION_RIGHT) {
 		super(gameRoom);
 
 		// position.x = horizontal(right positive), position.y = vertical(up positive).
@@ -60,10 +61,10 @@ class Player extends GameObject {
 	getLower(target_position = this.position) { return target_position.y; }
 	getLeft(target_position = this.position) { return target_position.x - PLAYER_WIDTH_2D * 0.5; }
 	getRight(target_position = this.position) { return target_position.x + PLAYER_WIDTH_2D * 0.5; }
-
+	
 	reset() {
 		// initialize positions
-		this.position = initial_position.clone();
+		this.position = this.initial_position.clone();
 		this.velocity = new THREE.Vector2(0, 0); // expected velocity, could be blocked by blocks.
 		this.direction = this.initial_direction;
 
@@ -96,7 +97,7 @@ class Player extends GameObject {
 		// initialize 3D shape;
 		
 	}
-	
+
 	// which blocks the player collides when on that position.
 	getCollision(target_position) {
 		var blocks = [];
@@ -126,13 +127,16 @@ class Player extends GameObject {
 		// movement phase
 		// find whether could move to the target directly.
 		var target_velocity = this.velocity.clone();
-		if (this.standing_on !== null) {
+		if (this.standing_on != null) {
 			target_velocity.addVectors(target_velocity, this.standing_on.velocity);
 		}
+		// window.alert("velocity:(" + this.velocity.x + "," + this.velocity.y + ")");
+		// window.alert("position:(" + this.position.x + "," + this.position.y + ")");
 		var target_position = new THREE.Vector2();
 		target_position.addVectors(this.position, target_velocity);
 
-		let collision_blocks = this.getCollision(target);
+		let collision_blocks = this.getCollision(target_position);
+
 		if (collision_blocks.length == 0) {
 			this.position = target_position;
 		}
@@ -144,10 +148,10 @@ class Player extends GameObject {
 				if (Math.max(this.getLower(), block.getLower()) < Math.min(this.getUpper(), block.getUpper())) {
 					let distance = block.getLeft() - this.getRight();
 					if (distance >= block.velocity.x)
-						movement_ub = Math.min(movement_ub, distance);
+						movement_ub = Math.min(movement_ub, distance - 1e-3);
 					distance = block.getRight() - this.getLeft();
 					if (distance <= block.velocity.x)
-						movement_lb = Math.max(movement_lb, distance);
+						movement_lb = Math.max(movement_lb, distance1e + 1e-3);
 				}
 			}
 			if (movement_lb > movement_ub) {
@@ -165,10 +169,10 @@ class Player extends GameObject {
 				if (Math.max(this.getLeft(), block.getLeft()) < Math.min(this.getRight(), block.getRight())) {
 					let distance = block.getLower() - this.getUpper();
 					if (distance >= block.velocity.y)
-						movement_ub = Math.min(movement_ub, distance);
+						movement_ub = Math.min(movement_ub, distance - 1e-3);
 					distance = block.getUpper() - this.getLower();
 					if (distance <= block.velocity.y)
-						movement_lb = Math.max(movement_lb, distance);
+						movement_lb = Math.max(movement_lb, distance + 1e-3);
 				}
 			}
 			if (movement_lb > movement_ub) {
@@ -187,18 +191,18 @@ class Player extends GameObject {
 		// standing on which block
 		let stands_on_candidate = this.getCollision(new THREE.Vector2(this.position.x, this.position.y - 1.0));
 		this.standing_on = this.decideStandBlock(stands_on_candidate);
-		if (this.standing_on !== null)
+		if (this.standing_on != null)
 			this.airjump_time = AIRJUMP_TIME_LIMIT;
 		else if (this.airjump_time > 0)
 			this.airjump_time = this.airjump_time - 1;
 
 		// for diagonal dashes, if hits the ground, change to horizontal dash and give a 1.2 multiplier to the horizontal speed.
-		if (this.dash_direction == DASH_DIRECTION_LEFT_DOWN && this.standing_on !== null) {
+		if (this.dash_direction == DASH_DIRECTION_LEFT_DOWN && this.standing_on != null) {
 			this.dash_direction = DASH_DIRECTION_LEFT;
 			this.velocity.y = 0;
 			this.velocity.x = this.velocity.x * 1.2;
 		}
-		if (this.dash_direction == DASH_DIRECTION_RIGHT_DOWN && this.standing_on !== null) {
+		if (this.dash_direction == DASH_DIRECTION_RIGHT_DOWN && this.standing_on != null) {
 			this.dash_direction = DASH_DIRECTION_RIGHT;
 			this.velocity.y = 0;
 			this.velocity.x = this.velocity.x * 1.2;
@@ -212,7 +216,7 @@ class Player extends GameObject {
 		if (this.dash_refresh_cd > 0) {
 			this.dash_refresh_cd = this.dash_refresh_cd - 1;
 		}
-		if (this.dash_refresh_cd <= 0 && this.standing_on !== null) {
+		if (this.dash_refresh_cd <= 0 && this.standing_on != null) {
 			this.dash_count = this.max_dash_count;
 		}
 		// about dash-time
@@ -237,7 +241,7 @@ class Player extends GameObject {
 
 		// parse speeds from nearby objects
 		// standing on
-		if (this.standing_on !== null) {
+		if (this.standing_on != null) {
 			if (this.standing_on.velocity.y > 1e-3) {
 				this.recent_touch_time_y = BOOST_TIME_LIMIT;
 				this.recent_touch_velocity.y = this.standing_on.velocity.y;
@@ -250,10 +254,11 @@ class Player extends GameObject {
 				this.velocity.y = 0;
 		}
 		// from side
-		let touch_left = this.getCollision(new THREE.Vector2(this.x - 1, this.y));
-		let touch_right = this.getCollision(new THREE.Vector2(this.x, this.y + 1));
+		let touch_left = this.getCollision(new THREE.Vector2(this.position.x - 1, this.position.y));
+		let touch_right = this.getCollision(new THREE.Vector2(this.position.x + 1, this.position.y));
 		this.touch_left = touch_left.length > 0;
 		this.touch_right = touch_right.length > 0;
+		// window.alert("touch_right:" + this.touch_right);
 		var velocity_x = 0.0;
 		if (this.direction == DIRECTION_LEFT) {
 			for (const block of touch_left) {
@@ -406,11 +411,11 @@ class Player extends GameObject {
 					// hyper dash
 					if (this.direction == DIRECTION_LEFT) {
 						this.velocity.x = -HYPER_SPEED;
-						this.velocity.y = JUMP_SPEED_Y * 0.5;
+						this.velocity.y = JUMP_SPEED_Y * 0.8;
 					}
 					else {
 						this.velocity.x = HYPER_SPEED;
-						this.velocity.y = JUMP_SPEED_Y * 0.5;
+						this.velocity.y = JUMP_SPEED_Y * 0.8;
 					}
 				}
 				else if (this.dash_time_remains > 0 && this.dash_direction == DASH_DIRECTION_LEFT || this.dash_direction == DASH_DIRECTION_RIGHT) {
@@ -441,11 +446,13 @@ class Player extends GameObject {
 				jumped = true;
 			}
 			else {
+				// window.alert("Consider wall jump?");
 				// consider wall-jumps
-				let could_wall_jump = (this.dash_time_remains > 0 && this.dash_direction == DASH_DIRECTION_UP);
+				let could_wall_bounce = (this.dash_time_remains > 0 && this.dash_direction == DASH_DIRECTION_UP);
+				// window.alert("Consider wall bounce?");
 				if (this.direction == DIRECTION_LEFT) {
 					if (this.touch_left) {
-						if (could_wall_jump) {
+						if (could_wall_bounce) {
 							this.velocity.x = 2.0;
 							this.velocity.y = 1.3 * JUMP_SPEED_Y;
 						}
@@ -458,7 +465,7 @@ class Player extends GameObject {
 						jumped = true;
 					}
 					else if (this.touch_right) {
-						if (could_wall_jump) {
+						if (could_wall_bounce) {
 							this.velocity.x = -2.0;
 							this.velocity.y = 1.3 * JUMP_SPEED_Y;
 						}
@@ -472,8 +479,9 @@ class Player extends GameObject {
 					}
 				}
 				else {
+					// window.alert("attach right?");
 					if (this.touch_right) {
-						if (could_wall_jump) {
+						if (could_wall_bounce) {
 							this.velocity.x = -2.0;
 							this.velocity.y = 1.3 * JUMP_SPEED_Y;
 						}
@@ -486,7 +494,7 @@ class Player extends GameObject {
 						jumped = true;
 					}
 					else if (this.touch_left) {
-						if (could_wall_jump) {
+						if (could_wall_bounce) {
 							this.velocity.x = 2.0;
 							this.velocity.y = 1.3 * JUMP_SPEED_Y;
 						}
@@ -515,6 +523,7 @@ class Player extends GameObject {
 	handleSpeedChange(keyboardValue) {
 		// handle accelerations caused by holding jump key and arrow keys, resistance and gravity.
 		if (this.dash_time_remains <= 0) { // when dashing, do not change the speed here.
+			// window.alert("handle_gravity!");
 			// handle gravity
 			if (this.velocity.y > 0) {
 				if (keyboardValue.Jump) {
@@ -524,12 +533,12 @@ class Player extends GameObject {
 					this.velocity.y -= GRAVITY;
 				}
 			}
-			else if (this.standing_on !== null) {
+			else if (this.standing_on == null) {
 				let target_speed = -2.6;
 				if (keyboardValue.Down)
 					target_speed = -4.0;
 				if (this.velocity.y > target_speed) {
-					if (keyboardValue.Down) {
+					if (keyboardValue.Down && this.velocity.y < -2.0) {
 						this.velocity.y = Math.max(this.velocity.y - GRAVITY * 2.0, target_speed);
 					}
 					else {
@@ -541,14 +550,15 @@ class Player extends GameObject {
 				}
 			}
 			// handle frictions
+			// console.log(keyboardValue.Right);
 			let friction_multiplier = 1.0;
-			if (this.standing_on !== null)
+			if (this.standing_on != null)
 				friction_multiplier = 1.5;
 			if (Math.abs(this.velocity.x) < friction_multiplier * BIGGER_RESISTANCE) {
 				if (keyboardValue.Left)
-					this.velocity.x += -SMALLER_RESISTANCE;
-				if (keyboardValue.Right)
 					this.velocity.x -= SMALLER_RESISTANCE;
+				if (keyboardValue.Right)
+					this.velocity.x += SMALLER_RESISTANCE;
 				else {
 					this.velocity.x = 0;
 				}
@@ -606,20 +616,23 @@ class Player extends GameObject {
 		this.handleMovement();
 		this.handleInteractiveObjects();
 		this.handlePlayerControl();
+		// window.alert("Successful?");
 	}
+
 	// setup the position and pose of the player object.
 	onRender() {
 		this.box.position.x = this.position.x;
 		this.box.position.y = this.position.y + PLAYER_HEIGHT_2D * 0.5;
 		this.box.position.z = 0;
+		/*
 		if (this.dash_count == 0) {
 			this.box.material.color = 0x0000ff;
 		}
 		else if (this.dash_count == 1) {
 			this.box.material.color = 0xff0000;
 		}
+		*/
 	}
-	
 }
 
 export default Player;
