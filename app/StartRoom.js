@@ -84,7 +84,6 @@ class StartRoom {
 		this.welcome_text.position.y = 50 + Math.sin(this.welcome_text_timer * 0.015) * 5;
 
 		// move level blocks
-		utils.InitKeyboard();
 		var keyboardValue = utils.getKeyboardValue();
 		if (keyboardValue.Left) {
 			if (this.keyValue != 1) {

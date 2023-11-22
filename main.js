@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 import { App } from './app';
+import * as utils from './utils'
 
 const FPS = 60;
 var now;
@@ -8,6 +9,7 @@ var then = Date.now();
 var interval = 1000 / FPS;
 var delta;
 
+utils.InitKeyboard();
 const app = new App();
 
 function animate() {

@@ -18,9 +18,9 @@ const FORWARD_SPEED = 1.5;
 const SMALLER_RESISTANCE = 4.3 / 60;
 const BIGGER_RESISTANCE = 10.8 / 60;
 
-const DASH_TIME = 13;
-const DASH_CD = 13;
-const DASH_REFRESH_CD = 8;
+const DASH_TIME = 10;
+const DASH_CD = 10;
+const DASH_REFRESH_CD = 6;
 const DASH_VELOCITY_BASE = 240.0 / 60;
 const SUPER_SPEED = 240.0 / 60;
 const HYPER_SPEED = 325.0 / 60;
@@ -254,8 +254,8 @@ class Player extends GameObject {
 				this.velocity.y = 0;
 		}
 		// from side
-		let touch_left = this.getCollision(new THREE.Vector2(this.position.x - 1, this.position.y));
-		let touch_right = this.getCollision(new THREE.Vector2(this.position.x + 1, this.position.y));
+		let touch_left = this.getCollision(new THREE.Vector2(this.position.x - 1.5, this.position.y));
+		let touch_right = this.getCollision(new THREE.Vector2(this.position.x + 1.5, this.position.y));
 		this.touch_left = touch_left.length > 0;
 		this.touch_right = touch_right.length > 0;
 		// window.alert("touch_right:" + this.touch_right);
@@ -555,9 +555,9 @@ class Player extends GameObject {
 			if (this.standing_on != null)
 				friction_multiplier = 1.5;
 			if (Math.abs(this.velocity.x) < friction_multiplier * BIGGER_RESISTANCE) {
-				if (keyboardValue.Left)
+				if (keyboardValue.Left && !keyboardValue.Right)
 					this.velocity.x -= SMALLER_RESISTANCE;
-				if (keyboardValue.Right)
+				else if (keyboardValue.Right && !keyboardValue.Left)
 					this.velocity.x += SMALLER_RESISTANCE;
 				else {
 					this.velocity.x = 0;

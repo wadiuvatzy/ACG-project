@@ -19,6 +19,7 @@ class GameRoom {
 		// add blocks
 		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(0, 0), 16, 20));
 		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(16, 0), 16, 50));
+		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(-16, 0), 16, 50));
 
 		// add lights
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
