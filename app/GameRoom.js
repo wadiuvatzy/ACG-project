@@ -17,9 +17,9 @@ class GameRoom {
 		this.special_objects = [];
 
 		// add blocks
-		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(0, 0), 16, 20));
-		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(16, 0), 16, 50));
-		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(-16, 0), 16, 50));
+		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(-10, 0), 26, 20));
+		// this.blocks.push(new game_objects.Block(this, new THREE.Vector2(16, 0), 16, 50));
+		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(-26, 0), 16, 50));
 
 		// add lights
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
@@ -79,6 +79,7 @@ class GameRoom {
 		}
 		else {
 			// TODO
+			window.alert("Paused");
 		}
 	}
 	// Compute the poses of objects, and then render the image.

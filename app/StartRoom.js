@@ -86,35 +86,37 @@ class StartRoom {
 		// move level blocks
 		var keyboardValue = utils.getKeyboardValue();
 		if (keyboardValue.Left) {
-			if (this.keyValue != 1) {
+			if (this.press_timer == 0 || this.keyValue != 1) {
+				this.current_level = (this.current_level + 2) % 3;
 				this.keyValue = 1;
 				this.press_timer = 0;
 			}
-			else {
-				this.press_timer += 1;
-				if (this.press_timer > 5) {
-					this.current_level = (this.current_level + 2) % 3;
-					this.press_timer = 0;
-				}
+			else if (this.press_timer == 11 && this.keyValue == 1) {
+				this.current_level = (this.current_level + 2) % 3;
+				this.press_timer = 0;
 			}
+			this.press_timer += 1;
+
 		}
-		if (keyboardValue.Right) {
-			if (this.keyValue != 2) {
+		else if (keyboardValue.Right) {
+			if (this.press_timer == 0 || this.keyValue != 2) {
+				this.current_level = (this.current_level + 1) % 3;
 				this.keyValue = 2;
 				this.press_timer = 0;
 			}
-			else {
-				this.press_timer += 1;
-				if (this.press_timer > 5) {
-					this.current_level = (this.current_level + 1) % 3;
-					this.press_timer = 0;
-				}
+			else if (this.press_timer == 11 && this.keyValue == 2) {
+				this.current_level = (this.current_level + 1) % 3;
+				this.press_timer = 0;
 			}
+			this.press_timer += 1;
 		}
-		if (keyboardValue.Jump) {
+		else if (keyboardValue.Jump) {
 			// TODO: load the level
 			// window.alert("Level " + this.current_level);
 			return this.current_level;
+		}
+		else {
+			this.press_timer = 0;
 		}
 		for (var i = 0; i < 3; i++) {
 			if (i == this.current_level) {

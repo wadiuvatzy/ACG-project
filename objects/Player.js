@@ -151,7 +151,7 @@ class Player extends GameObject {
 						movement_ub = Math.min(movement_ub, distance - 1e-3);
 					distance = block.getRight() - this.getLeft();
 					if (distance <= block.velocity.x)
-						movement_lb = Math.max(movement_lb, distance1e + 1e-3);
+						movement_lb = Math.max(movement_lb, distance + 1e-3);
 				}
 			}
 			if (movement_lb > movement_ub) {
@@ -624,14 +624,12 @@ class Player extends GameObject {
 		this.box.position.x = this.position.x;
 		this.box.position.y = this.position.y + PLAYER_HEIGHT_2D * 0.5;
 		this.box.position.z = 0;
-		/*
 		if (this.dash_count == 0) {
-			this.box.material.color = 0x0000ff;
+			this.box.material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
 		}
 		else if (this.dash_count == 1) {
-			this.box.material.color = 0xff0000;
+			this.box.material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
 		}
-		*/
 	}
 }
 
