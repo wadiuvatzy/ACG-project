@@ -16,6 +16,10 @@ class GameObject {
 	onRender() {
 
 	}
+	// compute player interaction
+	playerInteraction(player) {
+
+	}
 }
 
 export default GameObject;

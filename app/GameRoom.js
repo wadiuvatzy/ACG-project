@@ -46,6 +46,7 @@ class GameRoom {
 		this.special_objects = [];
 		// TODO: load room.
 
+		this.reset();
 	}
 	reset() {
 		this.player.reset();
@@ -61,11 +62,27 @@ class GameRoom {
 		// TODO: reset camera position.
 
 		this.paused = false;
+		this.wins = false;
 	}
 	// Given the time elapsed and keyboard inputs, compute the next state.
 	Step() {
 		var keyboardValue = utils.getKeyboardValue();
+		if (keyboardValue.ResetPressed) {
+			this.reset();
+		}
 		if (!this.paused) {
+			if (this.wins) {
+				// TODO
+				return;
+			}
+			else if (this.player.should_be_killed) {
+				// TODO (may be nothing to do here)
+				return;
+			}
+			if (keyboardValue.PausePressed) {
+				this.paused = true;
+				return;
+			}
 			for (var block of this.blocks) {
 				block.onStep();
 			}
@@ -79,26 +96,25 @@ class GameRoom {
 		}
 		else {
 			// TODO
-			window.alert("Paused");
+			// window.alert("Paused");
+			if (keyboardValue.PausePressed) {
+				this.paused = false;
+				return;
+			}
 		}
 	}
 	// Compute the poses of objects, and then render the image.
 	Render() {
-		if (!this.paused) {
-			for (var block of this.blocks) {
-				block.onRender();
-			}
-			for (var spike of this.spikes) {
-				spike.onRender();
-			}
-			for (var obj of this.special_objects) {
-				obj.onRender();
-			}
-			this.player.onRender();
+		for (var block of this.blocks) {
+			block.onRender();
 		}
-		else {
-			// TODO
+		for (var spike of this.spikes) {
+			spike.onRender();
 		}
+		for (var obj of this.special_objects) {
+			obj.onRender();
+		}
+		this.player.onRender();
 	}
 }
 

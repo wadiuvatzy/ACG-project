@@ -25,15 +25,15 @@ const DASH_VELOCITY_BASE = 240.0 / 60;
 const SUPER_SPEED = 240.0 / 60;
 const HYPER_SPEED = 325.0 / 60;
 
-const DASH_DIRECTION_NONE = 0;
-const DASH_DIRECTION_LEFT = 1;
-const DASH_DIRECTION_RIGHT = 2;
-const DASH_DIRECTION_UP = 3;
-const DASH_DIRECTION_DOWN = 4;
-const DASH_DIRECTION_LEFT_UP = 5;
-const DASH_DIRECTION_LEFT_DOWN = 6;
-const DASH_DIRECTION_RIGHT_UP = 7;
-const DASH_DIRECTION_RIGHT_DOWN = 8;
+export const DASH_DIRECTION_NONE = 0;
+export const DASH_DIRECTION_LEFT = 1;
+export const DASH_DIRECTION_RIGHT = 2;
+export const DASH_DIRECTION_UP = 3;
+export const DASH_DIRECTION_DOWN = 4;
+export const DASH_DIRECTION_LEFT_UP = 5;
+export const DASH_DIRECTION_LEFT_DOWN = 6;
+export const DASH_DIRECTION_RIGHT_UP = 7;
+export const DASH_DIRECTION_RIGHT_DOWN = 8;
 
 class Player extends GameObject {
 	
@@ -316,9 +316,20 @@ class Player extends GameObject {
 		}
 	}
 
-	// handle interactive objects such as spikes, breakable blocks, pumbers and springs.
+	// handle interactive objects such as spikes, breakable blocks, bouncy balls and springs.
 	handleInteractiveObjects() {
-		// TODO
+		// spikes
+		for (const spike of this.gameRoom.spikes) {
+			spike.playerInteraction(this);
+			if (this.should_be_killed)
+				return;
+		}
+		// some blocks may interact with players
+		for (const block of this.gameRoom.blocks)
+			block.playerInteraction(this);
+		// custom objects
+		for (const obj of this.gameRoom.special_objects)
+			obj.playerInteraction(this);
 	}
 
 	handleDash(keyboardValue) {
@@ -613,8 +624,14 @@ class Player extends GameObject {
 	}
 	// main simulation
 	onStep() {
+		if (this.should_be_killed)
+			return;
 		this.handleMovement();
+		if (this.should_be_killed)
+			return;
 		this.handleInteractiveObjects();
+		if (this.should_be_killed)
+			return;
 		this.handlePlayerControl();
 		// window.alert("Successful?");
 	}
@@ -624,7 +641,11 @@ class Player extends GameObject {
 		this.box.position.x = this.position.x;
 		this.box.position.y = this.position.y + PLAYER_HEIGHT_2D * 0.5;
 		this.box.position.z = 0;
-		if (this.dash_count == 0) {
+
+		if (this.should_be_killed) {
+			this.box.material = new THREE.MeshStandardMaterial({color: 0x8f8f8f})
+		}
+		else if (this.dash_count == 0) {
 			this.box.material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
 		}
 		else if (this.dash_count == 1) {

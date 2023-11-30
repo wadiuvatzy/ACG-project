@@ -9,7 +9,8 @@ const KeyCodes = {
 	'Left': 'ArrowLeft',
 	'Right': 'ArrowRight',
 	'Up': 'ArrowUp',
-	'Down': 'ArrowDown'
+	'Down': 'ArrowDown',
+	'Pause': 'Escape'
 }
 
 var KeyboardValue = {
@@ -20,7 +21,8 @@ var KeyboardValue = {
 	'Left': false,
 	'Right': false,
 	'Up': false,
-	'Down': false
+	'Down': false,
+	'PausePressed': false
 };
 
 var KeyboardValueNew = {
@@ -31,7 +33,8 @@ var KeyboardValueNew = {
 	'Left': false,
 	'Right': false,
 	'Up': false,
-	'Down': false
+	'Down': false,
+	'PausePressed': false
 };
 
 function getKeyboardValue() {
@@ -48,6 +51,7 @@ function KeyboardUpdate() {
 	KeyboardValueNew.ResetPressed = false;
 	KeyboardValueNew.JumpPressed = false;
 	KeyboardValueNew.DashPressed = false;
+	KeyboardValueNew.PausePressed = false;
 }
 
 function EventListenerKeyDown(event) {
@@ -70,6 +74,9 @@ function EventListenerKeyDown(event) {
 	}
 	else if (code == KeyCodes.Down) {
 		KeyboardValueNew.Down = true;
+	}
+	else if (code == KeyCodes.Pause) {
+		KeyboardValueNew.PausePressed = true;
 	}
 }
 
