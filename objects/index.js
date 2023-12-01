@@ -1,7 +1,7 @@
-export { default as GameObject } from './GameObject.js';
-export { default as Player } from './Player.js';
-export { default as Block } from './Blocks.js';
-export { default as Spike } from './Spikes.js';
+export { GameObject } from './GameObject.js';
+export { Player } from './Player.js';
+export { Block, WeakBlock, DropBlock } from './Blocks.js';
+export { Spike } from './Spikes.js';
 
 export { DIRECTION_LEFT, DIRECTION_RIGHT, GRAVITY } from './Player.js';
 

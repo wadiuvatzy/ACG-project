@@ -321,8 +321,10 @@ class Player extends GameObject {
 		// spikes
 		for (const spike of this.gameRoom.spikes) {
 			spike.playerInteraction(this);
-			if (this.should_be_killed)
+			if (this.should_be_killed) {
+				// window.alert("killed!");
 				return;
+			}
 		}
 		// some blocks may interact with players
 		for (const block of this.gameRoom.blocks)
@@ -654,4 +656,4 @@ class Player extends GameObject {
 	}
 }
 
-export default Player;
+export { Player };

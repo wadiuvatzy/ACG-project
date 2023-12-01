@@ -78,6 +78,9 @@ function EventListenerKeyDown(event) {
 	else if (code == KeyCodes.Pause) {
 		KeyboardValueNew.PausePressed = true;
 	}
+	else if (code == KeyCodes.Reset) {
+		KeyboardValueNew.ResetPressed = true;
+	}
 }
 
 function EventListenerKeyUp(event) {

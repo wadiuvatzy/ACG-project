@@ -72,7 +72,7 @@ class DropBlock extends Block {
 					let distance = this.getLower() - block.getUpper();
 					if (distance >= 0) {
 						if (this.velocity.y < -distance) {
-							this.velocity.y = distance;
+							this.velocity.y = -distance;
 							reset_speed = true;
 							reset_to = Math.max(block.velocity.y, -2.6);
 							target_block = block;
@@ -95,7 +95,7 @@ class DropBlock extends Block {
 					target_block.Breaks();
 			}
 		}
-		else {
+		else if (this.drop_timer > 0){
 			this.drop_timer -= 1;
 		}
 	}
@@ -144,9 +144,9 @@ class WeakBlock extends Block {
 			return;
 		// would touch this block at the next frame (if is not stopped)
 		var player_target_position = new THREE.Vector2(player.position.x + player.velocity.x, player.position.y + player.velocity.y);
-		if (Math.max(player.getLeftplayer_target_position(), this.getLeft()) > Math.min(player.getRight(player_target_position), this.getRight()))
+		if (Math.max(player.getLeft(player_target_position), this.getLeft()) >= Math.min(player.getRight(player_target_position), this.getRight()))
 			return;
-		if (Math.max(player.getLower(player_target_position), this.getLower()) > Math.min(player.getUpper(player_target_position), this.getUpper()))
+		if (Math.max(player.getLower(player_target_position), this.getLower()) >= Math.min(player.getUpper(player_target_position), this.getUpper()))
 			return;
 		// this block breaks, and the player stops.
 		this.Breaks();
@@ -171,4 +171,4 @@ class WeakBlock extends Block {
 }
 
 
-export default Block;
+export { Block, WeakBlock, DropBlock };

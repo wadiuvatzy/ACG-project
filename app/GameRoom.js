@@ -17,9 +17,15 @@ class GameRoom {
 		this.special_objects = [];
 
 		// add blocks
-		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(-10, 0), 26, 20));
+		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(-10, 0), 86, 20));
 		// this.blocks.push(new game_objects.Block(this, new THREE.Vector2(16, 0), 16, 50));
 		this.blocks.push(new game_objects.Block(this, new THREE.Vector2(-26, 0), 16, 50));
+		this.blocks.push(new game_objects.DropBlock(this, new THREE.Vector2(40, 30), 8, 8));
+		this.blocks.push(new game_objects.WeakBlock(this, new THREE.Vector2(30, 20), 24, 8));
+
+		// add spikes
+		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(-10, 40), null));
+		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(40, 30), this.blocks[2]));
 
 		// add lights
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);

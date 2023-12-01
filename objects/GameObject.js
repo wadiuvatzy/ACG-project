@@ -22,4 +22,4 @@ class GameObject {
 	}
 }
 
-export default GameObject;
+export { GameObject };
