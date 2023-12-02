@@ -217,7 +217,7 @@ class Player extends GameObject {
 			this.dash_refresh_cd = this.dash_refresh_cd - 1;
 		}
 		if (this.dash_refresh_cd <= 0 && this.standing_on != null) {
-			this.dash_count = this.max_dash_count;
+			this.dash_count = Math.max(this.max_dash_count, this.dash_count);
 		}
 		// about dash-time
 		if (this.dash_time_remains > 0) {

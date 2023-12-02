@@ -17,4 +17,6 @@ export { DASH_DIRECTION_RIGHT_UP } from './Player.js';
 export { DASH_DIRECTION_RIGHT_DOWN } from './Player.js';
 */
 
-export { BLOCK_UNIT_SIZE } from './Blocks.js';
+export { BLOCK_UNIT_SIZE, BLOCK_NORMAL, BLOCK_DROP, BLOCK_WEAK } from './Blocks.js';
+
+export { get_special_objects } from './SpecialObjects.js';

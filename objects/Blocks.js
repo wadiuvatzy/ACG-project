@@ -1,5 +1,5 @@
 import { GameObject, GRAVITY } from '../objects';
-import * as THREE from 'three'
+import * as THREE from 'three';
 
 export const BLOCK_UNIT_SIZE = 8;
 export const BLOCK_NORMAL = 0;
