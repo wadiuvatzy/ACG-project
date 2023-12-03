@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import * as utils from '../utils';
 import * as game_objects from '../objects';
+import * as levels from '../levels';
 
 class GameRoom {
 	constructor() {
@@ -9,8 +10,13 @@ class GameRoom {
 		this.paused = false;
 		this.room_height = 0;
 		this.room_width = 0;
+		this.player = null;
+		this.blocks = [];
+		this.spikes = [];
+		this.special_objects = [];
 	}
 	init_debug() {
+		/*
 		this.player = new game_objects.Player(this, new THREE.Vector2(0, 20));
 		this.blocks = [];
 		this.spikes = [];
@@ -26,6 +32,9 @@ class GameRoom {
 		// add spikes
 		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(-10, 40), null));
 		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(40, 30), this.blocks[2]));
+		*/
+		
+		levels.make_level(this, levels.NameToLevel["Tutorial_easy1"]);
 
 		// add lights
 		const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
@@ -37,20 +46,9 @@ class GameRoom {
 		const ambientlight = new THREE.AmbientLight(0x404040); // soft white light
 		this.scene.add(ambientlight);
 
-		this.camera.position.x = 10;
-		this.camera.position.y = 50;
-		this.camera.position.z = 100;
-
-		this.reset();
-	}
-	load_room(room_file) {
-		// this.player = new game_objects.Player();
-		// these two are special.
-		this.blocks = [];
-		this.spikes = [];
-		// TODO: add other objects;
-		this.special_objects = [];
-		// TODO: load room.
+		this.camera.position.x = 152;
+		this.camera.position.y = 64;
+		this.camera.position.z = 200;
 
 		this.reset();
 	}
