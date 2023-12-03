@@ -5,19 +5,84 @@ import * as levels from '../levels';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
+
+class CameraTrigger {
+	constructor(left, right, low, high, border_left, border_right, border_low, border_high, z = 150, xy_gamma = 0.05, z_velocity = 2.0) {
+		this.left = left;
+		this.right = right;
+		this.low = low;
+		this.high = high;
+		this.border_left = border_left;
+		this.border_right = border_right;
+		this.border_low = border_low;
+		this.border_high = border_high;
+		this.z = z;
+		this.gamma = xy_gamma;
+		this.z_velocity = z_velocity;
+	}
+	be_triggered(player_position) {
+		return this.left < player_position.x && player_position.x < this.right && this.low < player_position.y && player_position.y < this.high;
+	}
+	get_target_position(player_position) {
+		var target_position = new THREE.Vector3();
+		target_position.x = Math.max(this.border_left, Math.min(this.border_right, player_position.x));
+		target_position.y = Math.max(this.border_low, Math.min(this.border_high, player_position.y));
+		target_position.z = this.z;
+		return target_position;
+	}
+	move_to_target_position(player_position, camera_position) {
+		var target_position = new THREE.Vector3();
+		if (camera_position.z < this.z)
+			target_position.z = Math.min(this.z, camera_position.z + this.z_velocity);
+		else if (camera_position.z > this.z)
+			target_position.z = Math.max(this.z, camera_position.z - this.z_velocity);
+		else
+			target_position.z = this.z;
+		target_position.x = camera_position.x * (1 - this.gamma) + this.gamma * Math.max(this.border_left, Math.min(this.border_right, player_position.x));
+		target_position.y = camera_position.y * (1 - this.gamma) + this.gamma * Math.max(this.border_low, Math.min(this.border_high, player_position.y));
+		return target_position;
+	}
+}
+
+
+class CameraController {
+	constructor(gameRoom) {
+		this.gameRoom = gameRoom;
+		this.triggers = []
+		this.triggers.push(new CameraTrigger(-100, -100, -100, -100, -10000, 10000, 32, 64));
+		this.current_trigger = this.triggers[0];
+	}
+	reset() {
+		this.current_trigger = this.triggers[0];
+		let target_position = this.current_trigger.get_target_position(this.gameRoom.player.position);
+		this.gameRoom.camera.position.x = target_position.x;
+		this.gameRoom.camera.position.y = target_position.y;
+		this.gameRoom.camera.position.z = target_position.z;
+	}
+	onStep() {
+		for (const trigger of this.triggers)
+			if (trigger.be_triggered(this.gameRoom.player.position))
+				this.current_trigger = trigger;
+		let target_position = this.current_trigger.move_to_target_position(this.gameRoom.player.position, this.gameRoom.camera.position);
+		this.gameRoom.camera.position.x = target_position.x;
+		this.gameRoom.camera.position.y = target_position.y;
+		this.gameRoom.camera.position.z = target_position.z;
+	}
+}
+
+
 class GameRoom {
 	constructor() {
 		this.scene = new THREE.Scene();
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 		this.paused = false;
-		this.room_height = 0;
-		this.room_width = 0;
 		this.player = null;
 		this.blocks = [];
 		this.spikes = [];
 		this.special_objects = [];
 		this.dead_waiting_reset = false;
 		this.just_dead = false;
+		this.camera_controller = new CameraController(this);
 	}
 	init_debug() {
 		/*
@@ -37,7 +102,6 @@ class GameRoom {
 		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(-10, 40), null));
 		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(40, 30), this.blocks[2]));
 		*/
-
 		levels.make_level(this, levels.NameToLevel["Tutorial_easy1"]);
 
 		// add lights
@@ -53,6 +117,7 @@ class GameRoom {
 		this.camera.position.x = 100;
 		this.camera.position.y = 64;
 		this.camera.position.z = 200;
+
 		this.reset();
 	}
 	reset() {
@@ -67,6 +132,7 @@ class GameRoom {
 			obj.reset();
 		}
 		// TODO: reset camera position.
+		this.camera_controller.reset();
 
 		this.paused = false;
 		this.wins = false;
@@ -79,7 +145,6 @@ class GameRoom {
 		this.directionalLight.position.z = 20;
 		this.scene.add(this.directionalLight);
 		this.scene.remove(this.reset_text);
-
 	}
 	// Given the time elapsed and keyboard inputs, compute the next state.
 	Step() {
@@ -118,6 +183,9 @@ class GameRoom {
 				obj.onStep();
 			}
 			this.player.onStep();
+
+			// camera control
+			this.camera_controller.onStep();
 		}
 		else {
 			// TODO
@@ -178,4 +246,4 @@ class GameRoom {
 	}
 }
 
-export default GameRoom;
+export { GameRoom, CameraTrigger };

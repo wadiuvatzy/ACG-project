@@ -2,6 +2,7 @@
 import * as game_objects from '../objects';
 import * as THREE from 'three';
 import { BLOCK_UNIT_SIZE } from '../objects/Blocks';
+import { CameraTrigger } from '../app/GameRoom';
 
 function create_block(gameRoom, data) {
 	let block_type = data.type;
@@ -50,6 +51,7 @@ export function make_level(gameRoom, level_data) {
 	let blocks_data = level_data.blocks;
 	let spikes_data = level_data.spikes;
 	let special_objects_data = level_data.special_objects;
+	let camera_triggers_data = level_data.camera_triggers;
 	// player
 	gameRoom.player = new game_objects.Player(gameRoom, new THREE.Vector2(player_data.x * BLOCK_UNIT_SIZE + 4, player_data.y * BLOCK_UNIT_SIZE), player_data.direction);
 
@@ -69,5 +71,23 @@ export function make_level(gameRoom, level_data) {
 	gameRoom.special_objects = [];
 	for (const obj of special_objects_data) {
 		create_special_object(gameRoom, obj);
+	}
+
+	// camera triggers
+	gameRoom.camera_controller.triggers = [];
+	for (var i = 0; i < camera_triggers_data.length; i += 11) {
+		gameRoom.camera_controller.triggers.push(new CameraTrigger(
+			camera_triggers_data[i + 0] * BLOCK_UNIT_SIZE,
+			camera_triggers_data[i + 1] * BLOCK_UNIT_SIZE,
+			camera_triggers_data[i + 2] * BLOCK_UNIT_SIZE,
+			camera_triggers_data[i + 3] * BLOCK_UNIT_SIZE,
+			camera_triggers_data[i + 4] * BLOCK_UNIT_SIZE,
+			camera_triggers_data[i + 5] * BLOCK_UNIT_SIZE,
+			camera_triggers_data[i + 6] * BLOCK_UNIT_SIZE,
+			camera_triggers_data[i + 7] * BLOCK_UNIT_SIZE,
+			camera_triggers_data[i + 8],
+			camera_triggers_data[i + 9],
+			camera_triggers_data[i + 10]
+		))
 	}
 }

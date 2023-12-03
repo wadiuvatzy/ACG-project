@@ -162,6 +162,7 @@ class Player extends GameObject {
 				target_velocity.x = Math.max(target_velocity.x, movement_lb);
 				target_velocity.x = Math.min(target_velocity.x, movement_ub);
 			}
+			this.position.x = this.position.x + target_velocity.x;
 
 			movement_ub = 1e9;
 			movement_lb = -1e9;
@@ -183,7 +184,7 @@ class Player extends GameObject {
 				target_velocity.y = Math.max(target_velocity.y, movement_lb);
 				target_velocity.y = Math.min(target_velocity.y, movement_ub);
 			}
-			this.position.add(target_velocity);
+			this.position.y = this.position.y + target_velocity.y;
 		}
 
 		// state (including standing on which block and the dash state) computing phase
@@ -645,7 +646,7 @@ class Player extends GameObject {
 		this.box.position.z = 0;
 
 		if (this.should_be_killed) {
-			this.box.material = new THREE.MeshStandardMaterial({color: 0x8f8f8f})
+			this.box.material = new THREE.MeshStandardMaterial({ color: 0x8f8f8f });
 		}
 		else if (this.dash_count == 0) {
 			this.box.material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
