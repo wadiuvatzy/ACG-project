@@ -43,8 +43,8 @@ class StartRoom {
 		this.welcome_text = null;
 		this.welcome_text_timer = 0;
 		const loader = new FontLoader();
-		loader.load( '../fonts/helvetiker_regular.typeface.json', function ( font ) {
-			var geometry = new TextGeometry( 'Welcome!', {
+		loader.load('../fonts/helvetiker_regular.typeface.json', function (font) {
+			var geometry = new TextGeometry('Welcome!', {
 				font: font,
 				size: 20,
 				height: 2,
@@ -53,13 +53,13 @@ class StartRoom {
 				bevelThickness: 2,
 				bevelSize: 2,
 				bevelSegments: 1
-			} );
+			});
 			geometry.computeBoundingBox();
 			geometry.center();
-			var material = new THREE.MeshStandardMaterial( { color: 0x00ffff } );
-			this.welcome_text = new THREE.Mesh( geometry, material );
-			this.scene.add( this.welcome_text );
-		}.bind(this) );
+			var material = new THREE.MeshStandardMaterial({ color: 0x00ffff });
+			this.welcome_text = new THREE.Mesh(geometry, material);
+			this.scene.add(this.welcome_text);
+		}.bind(this));
 
 		// create level boxes
 		for (var i = 0; i < 3; i++) {
@@ -72,10 +72,11 @@ class StartRoom {
 			this.scene.add(cube);
 			this.level_blocks.push(cube);
 		}
+		this.scene.background = new THREE.TextureLoader().load('../textures/background.jpg');
 
 	}
 	reset() {
-		
+
 	}
 	Step() {
 		// move welcome text
