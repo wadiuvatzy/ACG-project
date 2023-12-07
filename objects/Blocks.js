@@ -59,6 +59,7 @@ class DropBlock extends Block {
 		this.position = this.initial_position.clone();
 		this.velocity = new THREE.Vector2(0, 0);
 		this.drop_timer = -1;  // -1 means not triggered, positive means triggered but not dropped, and 0 means dropping.
+		this.offset = new THREE.Vector2(0, 0);
 	}
 	onStep() {
 		if (this.drop_timer == 0) {
@@ -95,7 +96,11 @@ class DropBlock extends Block {
 					target_block.Breaks();
 			}
 		}
-		else if (this.drop_timer > 0){
+		else if (this.drop_timer > 0) {
+			if (this.drop_timer % 5 == 0) {
+				this.offset.x = Math.random() * 4 - 2;
+				this.offset.y = Math.random() * 4 - 2;
+			}
 			this.drop_timer -= 1;
 		}
 	}
@@ -108,6 +113,15 @@ class DropBlock extends Block {
 		else {
 			if (!player_is_on)
 				this.drop_timer = 0;
+		}
+	}
+	onRender() {
+		this.box.position.x = this.position.x + this.width * 0.5;
+		this.box.position.y = this.position.y + this.height * 0.5;
+		this.box.position.z = 0;
+		if (this.drop_timer > 0) {
+			this.box.position.x += this.offset.x;
+			this.box.position.y += this.offset.y;
 		}
 	}
 }

@@ -30,6 +30,6 @@ export const lv_Tutorial_easy1 = {
 		{ "type": "GameGoal", "x": 17.5, "y": 4 }
 	],
 	"camera_triggers": [
-		0, 19, -4, 14, 9, 9, 4, 4, 125, 0.1, 5.0,
+		0, 19, -4, 14, 9, 9, 4, 4, 125, 0.1, 5.0, 0.0, 0.0
 	]
 };

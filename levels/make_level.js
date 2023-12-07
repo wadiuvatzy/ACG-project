@@ -75,7 +75,7 @@ export function make_level(gameRoom, level_data) {
 
 	// camera triggers
 	gameRoom.camera_controller.triggers = [];
-	for (var i = 0; i < camera_triggers_data.length; i += 11) {
+	for (var i = 0; i < camera_triggers_data.length; i += 13) {
 		gameRoom.camera_controller.triggers.push(new CameraTrigger(
 			camera_triggers_data[i + 0] * BLOCK_UNIT_SIZE,
 			camera_triggers_data[i + 1] * BLOCK_UNIT_SIZE,
@@ -87,7 +87,9 @@ export function make_level(gameRoom, level_data) {
 			camera_triggers_data[i + 7] * BLOCK_UNIT_SIZE,
 			camera_triggers_data[i + 8],
 			camera_triggers_data[i + 9],
-			camera_triggers_data[i + 10]
+			camera_triggers_data[i + 10],
+			camera_triggers_data[i + 11],
+			camera_triggers_data[i + 12],
 		))
 	}
 }

@@ -7,7 +7,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 
 class CameraTrigger {
-	constructor(left, right, low, high, border_left, border_right, border_low, border_high, z = 150, xy_gamma = 0.05, z_velocity = 2.0) {
+	constructor(left, right, low, high, border_left, border_right, border_low, border_high, z = 150, xy_gamma = 0.05, z_velocity = 2.0, player_offset_x = 0.0, player_offset_y = 0.0) {
 		this.left = left;
 		this.right = right;
 		this.low = low;
@@ -19,14 +19,16 @@ class CameraTrigger {
 		this.z = z;
 		this.gamma = xy_gamma;
 		this.z_velocity = z_velocity;
+		this.player_offset_x = player_offset_x;
+		this.player_offset_y = player_offset_y;
 	}
 	be_triggered(player_position) {
 		return this.left < player_position.x && player_position.x < this.right && this.low < player_position.y && player_position.y < this.high;
 	}
 	get_target_position(player_position) {
 		var target_position = new THREE.Vector3();
-		target_position.x = Math.max(this.border_left, Math.min(this.border_right, player_position.x));
-		target_position.y = Math.max(this.border_low, Math.min(this.border_high, player_position.y));
+		target_position.x = Math.max(this.border_left, Math.min(this.border_right, player_position.x + this.player_offset_x));
+		target_position.y = Math.max(this.border_low, Math.min(this.border_high, player_position.y + this.player_offset_y));
 		target_position.z = this.z;
 		return target_position;
 	}
@@ -38,8 +40,8 @@ class CameraTrigger {
 			target_position.z = Math.max(this.z, camera_position.z - this.z_velocity);
 		else
 			target_position.z = this.z;
-		target_position.x = camera_position.x * (1 - this.gamma) + this.gamma * Math.max(this.border_left, Math.min(this.border_right, player_position.x));
-		target_position.y = camera_position.y * (1 - this.gamma) + this.gamma * Math.max(this.border_low, Math.min(this.border_high, player_position.y));
+		target_position.x = camera_position.x * (1 - this.gamma) + this.gamma * Math.max(this.border_left, Math.min(this.border_right, player_position.x + this.player_offset_x));
+		target_position.y = camera_position.y * (1 - this.gamma) + this.gamma * Math.max(this.border_low, Math.min(this.border_high, player_position.y + this.player_offset_y));
 		return target_position;
 	}
 }
@@ -102,7 +104,7 @@ class GameRoom {
 		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(-10, 40), null));
 		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(40, 30), this.blocks[2]));
 		*/
-		levels.make_level(this, levels.NameToLevel["Tutorial_easy1"]);
+		levels.make_level(this, levels.NameToLevel["Tutorial_easy2"]);
 
 		// add lights
 		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);

@@ -1,5 +1,6 @@
 
 import { lv_Tutorial_easy1 } from "./lv_Tutorial_easy1.js";
+import { lv_Tutorial_easy2 } from "./lv_Tutorial_easy2.js";
 
 export { make_level } from "./make_level.js";
 
@@ -12,6 +13,6 @@ export const Levels = {
 // each name corresponds to an object, contains information of that level.
 export const NameToLevel = {
 	"Tutorial_easy1": lv_Tutorial_easy1,
-	"Tutorial_easy2": null,
+	"Tutorial_easy2": lv_Tutorial_easy2,
 	"Tutorial_easy3": null,
 }
