@@ -1,0 +1,11 @@
+Model Information:
+* title:	Strawberry from Celeste (Voxel)
+* source:	https://sketchfab.com/3d-models/strawberry-from-celeste-voxel-5c2e4781a5284019a1a12b185d023a89
+* author:	tobsjjs (https://sketchfab.com/tobsjjs)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Strawberry from Celeste (Voxel)" (https://sketchfab.com/3d-models/strawberry-from-celeste-voxel-5c2e4781a5284019a1a12b185d023a89) by tobsjjs (https://sketchfab.com/tobsjjs) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

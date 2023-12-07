@@ -1,0 +1,11 @@
+Model Information:
+* title:	Madeline from Celeste
+* source:	https://sketchfab.com/3d-models/madeline-from-celeste-38be39394e334e639fdadd750561e83d
+* author:	asuperpanda (https://sketchfab.com/asuperpanda)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Madeline from Celeste" (https://sketchfab.com/3d-models/madeline-from-celeste-38be39394e334e639fdadd750561e83d) by asuperpanda (https://sketchfab.com/asuperpanda) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
