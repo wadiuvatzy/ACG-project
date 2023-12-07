@@ -1,6 +1,7 @@
 import { GameObject, GRAVITY, BLOCK_UNIT_SIZE } from '../objects';
 import * as THREE from 'three';
 import { DASH_DIRECTION_NONE, DIRECTION_LEFT, DIRECTION_RIGHT } from './Player';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 
 class GameGoal extends GameObject {
@@ -12,9 +13,21 @@ class GameGoal extends GameObject {
 
 		// initialize shape
 		const geometry = new THREE.SphereGeometry(this.size, 16, 16);  // To be modified
-		const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+		const material = new THREE.MeshStandardMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
 		this.sphere = new THREE.Mesh(geometry, material);
 		this.gameRoom.scene.add(this.sphere);
+
+		const gltfLoader = new GLTFLoader();
+		const url = '../models3D/strawberry_from_celeste_voxel/scene.gltf';
+		gltfLoader.load(url, (gltf) => {
+			const root = gltf.scene;
+			this.strawberry = root.children[0];
+			let scale = 2;
+			this.strawberry_offset_x = 45 / 2 * scale;
+			this.strawberry_offset_y = 50 / 2 * scale;
+			this.strawberry.scale.set(scale, scale, scale);
+			this.gameRoom.scene.add(root);
+		})
 
 		this.iter = 0;
 	}
@@ -48,7 +61,10 @@ class GameGoal extends GameObject {
 			goal_color = 0xff0000 + Math.floor((180 - this.iter) / 30 * 0xff) * 0x000001;
 		}
 
-		this.sphere.material = new THREE.MeshStandardMaterial({ color: goal_color });
+		this.sphere.material = new THREE.MeshStandardMaterial({ color: goal_color, transparent: true, opacity: 0.5 });
+		this.strawberry.position.x = this.sphere.position.x - this.strawberry_offset_x;
+		this.strawberry.position.y = this.sphere.position.y - this.strawberry_offset_y;
+		this.strawberry.position.z = 30;
 	}
 	playerInteraction(player) {
 		// collision

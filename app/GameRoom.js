@@ -104,7 +104,7 @@ class GameRoom {
 		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(-10, 40), null));
 		this.spikes.push(new game_objects.Spike(this, new THREE.Vector2(40, 30), this.blocks[2]));
 		*/
-		levels.make_level(this, levels.NameToLevel["Tutorial_easy2"]);
+		levels.make_level(this, levels.NameToLevel["Tutorial_easy1"]);
 
 		// add lights
 		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
