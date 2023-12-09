@@ -1,9 +1,10 @@
 import * as THREE from 'three'
 import { GameObject } from '../objects'
 import * as utils from '../utils'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 const PLAYER_HEIGHT_2D = 12;
-const PLAYER_WIDTH_2D = 8;
+const PLAYER_WIDTH_2D = 6;
 
 export const DIRECTION_LEFT = 0;
 export const DIRECTION_RIGHT = 1;
@@ -35,20 +36,50 @@ export const DASH_DIRECTION_LEFT_DOWN = 6;
 export const DASH_DIRECTION_RIGHT_UP = 7;
 export const DASH_DIRECTION_RIGHT_DOWN = 8;
 
+function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+	const localPrefix = isLast ? '└─' : '├─';
+	lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
+	const newPrefix = prefix + (isLast ? '  ' : '│ ');
+	const lastNdx = obj.children.length - 1;
+	obj.children.forEach((child, ndx) => {
+		const isLast = ndx === lastNdx;
+		dumpObject(child, lines, isLast, newPrefix);
+	});
+	return lines;
+}
+
 class Player extends GameObject {
-	
+
 	constructor(gameRoom, initial_position, initial_direction = DIRECTION_RIGHT) {
 		super(gameRoom);
 
 		// position.x = horizontal(right positive), position.y = vertical(up positive).
 		this.initial_position = initial_position.clone();
 		this.initial_direction = initial_direction;
-		
+
 		// Create the 3D object.
+		// for debugging, the box is also shown, but it is transparent
+		this.box_opacity = 0.8;
 		const geometry = new THREE.BoxGeometry(PLAYER_WIDTH_2D, PLAYER_HEIGHT_2D, PLAYER_WIDTH_2D);
-		const material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+		const material = new THREE.MeshLambertMaterial({ color: 0xff0000, transparent: true, opacity: this.box_opacity });
 		this.box = new THREE.Mesh(geometry, material);
 		this.gameRoom.scene.add(this.box);
+
+
+		//change to the 3D Model here
+		this.madeline = null;
+		const gltfLoader = new GLTFLoader();
+		const url = '../models3D/madeline_from_celeste/scene.gltf';
+		gltfLoader.load(url, (gltf) => {
+			const root = gltf.scene;
+			this.madeline = root.children[0];
+			this.madeline.scale.set(5, 5, 5);
+			this.gameRoom.scene.add(root);
+			// window.alert(dumpObject(root).join('\n'));
+			let madeline_mesh = root.getObjectByName("madeline_madeline_1_0");
+			madeline_mesh.geometry.computeBoundingBox();
+			madeline_mesh.geometry.center();
+		})
 
 		// initialize the other attributes.
 		this.reset();
@@ -61,7 +92,7 @@ class Player extends GameObject {
 	getLower(target_position = this.position) { return target_position.y; }
 	getLeft(target_position = this.position) { return target_position.x - PLAYER_WIDTH_2D * 0.5; }
 	getRight(target_position = this.position) { return target_position.x + PLAYER_WIDTH_2D * 0.5; }
-	
+
 	reset() {
 		// initialize positions
 		this.position = this.initial_position.clone();
@@ -93,9 +124,6 @@ class Player extends GameObject {
 		this.touch_right = false;
 
 		this.should_be_killed = false;
-
-		// initialize 3D shape;
-		
 	}
 
 	// which blocks the player collides when on that position.
@@ -264,7 +292,6 @@ class Player extends GameObject {
 		if (this.direction == DIRECTION_LEFT) {
 			for (const block of touch_left) {
 				velocity_x = Math.max(velocity_x, block.velocity.x);
-					
 			}
 			if (velocity_x <= 0.0) {
 				for (const block of touch_right) {
@@ -644,15 +671,18 @@ class Player extends GameObject {
 		this.box.position.x = this.position.x;
 		this.box.position.y = this.position.y + PLAYER_HEIGHT_2D * 0.5;
 		this.box.position.z = 0;
+		this.madeline.position.x = this.box.position.x;
+		this.madeline.position.y = this.box.position.y;
+		this.madeline.position.z = this.box.position.z;
 
 		if (this.should_be_killed) {
-			this.box.material = new THREE.MeshStandardMaterial({ color: 0x8f8f8f });
+			this.box.material = new THREE.MeshStandardMaterial({ color: 0x8f8f8f, transparent: true, opacity: this.box_opacity });
 		}
 		else if (this.dash_count == 0) {
-			this.box.material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+			this.box.material = new THREE.MeshStandardMaterial({ color: 0x0000ff, transparent: true, opacity: this.box_opacity });
 		}
 		else if (this.dash_count == 1) {
-			this.box.material = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+			this.box.material = new THREE.MeshStandardMaterial({ color: 0xff0000, transparent: true, opacity: this.box_opacity });
 		}
 	}
 }
