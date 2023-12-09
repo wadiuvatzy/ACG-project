@@ -30,9 +30,11 @@ class Block extends GameObject {
 
 	reset() {
 		this.position = this.initial_position.clone();
+		this.previous_position = this.position.clone();
 		this.velocity = new THREE.Vector2(0, 0);
 	}
 	onStep() {
+		this.previous_position = this.position.clone();
 		this.position.add(this.velocity);
 	}
 	onRender() {
@@ -57,11 +59,13 @@ class DropBlock extends Block {
 	}
 	reset() {
 		this.position = this.initial_position.clone();
+		this.previous_position = this.position.clone();
 		this.velocity = new THREE.Vector2(0, 0);
 		this.drop_timer = -1;  // -1 means not triggered, positive means triggered but not dropped, and 0 means dropping.
 		this.offset = new THREE.Vector2(0, 0);
 	}
 	onStep() {
+		this.previous_position = this.position.clone();
 		if (this.drop_timer == 0) {
 			this.velocity.y = Math.max(-2.6, this.velocity.y - GRAVITY);
 			// compute maximum drop distance
@@ -136,7 +140,9 @@ class WeakBlock extends Block {
 		this.box.material = new THREE.MeshStandardMaterial({ color: 0x008f00 });
 	}
 	reset() {
+		this.previous_position = this.position.clone();
 		this.position = this.initial_position.clone();
+		this.previous_position = this.position.clone();
 		this.velocity = new THREE.Vector2(0, 0);
 		if (this.crashed) {
 			this.gameRoom.scene.add(this.box);
@@ -147,6 +153,7 @@ class WeakBlock extends Block {
 		this.crashed = true;
 		this.gameRoom.scene.remove(this.box);
 		this.position = new THREE.Vector2(-100, -100);
+		this.previous_position = this.position.clone();
 	}
 	playerInteraction(player) {
 		if (player.dash_time_remains <= 0)

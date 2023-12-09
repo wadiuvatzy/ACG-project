@@ -147,11 +147,11 @@ class Player extends GameObject {
 			for (const block of this.gameRoom.blocks) {
 				if (Math.max(this.getLower(), block.getLower()) < Math.min(this.getUpper(), block.getUpper())) {
 					let distance = block.getLeft() - this.getRight();
-					if (distance >= block.velocity.x)
-						movement_ub = Math.min(movement_ub, distance - 1e-3);
+					if (block.getLeft(block.previous_position) >= this.getRight() - 1e-3)
+						movement_ub = Math.min(movement_ub, distance);
 					distance = block.getRight() - this.getLeft();
-					if (distance <= block.velocity.x)
-						movement_lb = Math.max(movement_lb, distance + 1e-3);
+					if (block.getRight(block.previous_position) <= this.getLeft() + 1e-3)
+						movement_lb = Math.max(movement_lb, distance);
 				}
 			}
 			if (movement_lb > movement_ub) {
@@ -169,11 +169,11 @@ class Player extends GameObject {
 			for (const block of this.gameRoom.blocks) {
 				if (Math.max(this.getLeft(), block.getLeft()) < Math.min(this.getRight(), block.getRight())) {
 					let distance = block.getLower() - this.getUpper();
-					if (distance >= block.velocity.y)
-						movement_ub = Math.min(movement_ub, distance - 1e-3);
+					if (block.getLower(block.previous_position) >= this.getUpper() - 1e-3)
+						movement_ub = Math.min(movement_ub, distance);
 					distance = block.getUpper() - this.getLower();
-					if (distance <= block.velocity.y)
-						movement_lb = Math.max(movement_lb, distance + 1e-3);
+					if (block.getUpper(block.previous_position) <= this.getLower() + 1e-3)
+						movement_lb = Math.max(movement_lb, distance);
 				}
 			}
 			if (movement_lb > movement_ub) {
