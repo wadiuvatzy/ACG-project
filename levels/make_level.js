@@ -19,6 +19,8 @@ function create_block(gameRoom, data) {
 		gameRoom.blocks.push(new game_objects.DropBlock(gameRoom, position, w, h));
 	else if (block_type == "WeakBlock")
 		gameRoom.blocks.push(new game_objects.WeakBlock(gameRoom, position, w, h));
+	else if (block_type == "ShakingBlock")
+		gameRoom.blocks.push(new game_objects.ShakingBlock(gameRoom, position, new THREE.Vector2(data.x2 * BLOCK_UNIT_SIZE, data.y2 * BLOCK_UNIT_SIZE), w, h));
 	else {
 		window.alert("wtf");
 		// ??
@@ -29,14 +31,17 @@ function create_spike(gameRoom, data) {
 	let type = data.type;
 	let x = data.x * BLOCK_UNIT_SIZE;
 	let y = data.y * BLOCK_UNIT_SIZE;
-	let attached_to = data.attached_to;
 
 	let position = new THREE.Vector2(x, y);
-	if (attached_to != null)
-		attached_to = gameRoom.blocks[attached_to];
-
-	if (type == "Spike")
+	
+	if (type == "Spike") {
+		let attached_to = data.attached_to;
+		if (attached_to != null)
+			attached_to = gameRoom.blocks[attached_to];
 		gameRoom.spikes.push(new game_objects.Spike(gameRoom, position, attached_to));
+	}
+	else if (type == "DeadlyBlock")
+		gameRoom.spikes.push(new game_objects.DeadlyBlock(gameRoom, position, data.w * BLOCK_UNIT_SIZE, data.h * BLOCK_UNIT_SIZE))
 	else {
 		// ??
 	}

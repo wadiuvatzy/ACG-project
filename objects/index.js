@@ -1,7 +1,7 @@
 export { GameObject } from './GameObject.js';
 export { Player } from './Player.js';
-export { Block, WeakBlock, DropBlock } from './Blocks.js';
-export { Spike } from './Spikes.js';
+export { Block, WeakBlock, DropBlock, ShakingBlock } from './Blocks.js';
+export { Spike, DeadlyBlock } from './Spikes.js';
 
 export { DIRECTION_LEFT, DIRECTION_RIGHT, GRAVITY } from './Player.js';
 

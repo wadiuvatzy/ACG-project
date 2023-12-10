@@ -63,7 +63,7 @@ class Player extends GameObject {
 		const geometry = new THREE.BoxGeometry(PLAYER_WIDTH_2D, PLAYER_HEIGHT_2D, PLAYER_WIDTH_2D);
 		const material = new THREE.MeshLambertMaterial({ color: 0xff0000, transparent: true, opacity: this.box_opacity });
 		this.box = new THREE.Mesh(geometry, material);
-		this.gameRoom.scene.add(this.box);
+		// this.gameRoom.scene.add(this.box);
 
 
 		//change to the 3D Model here
@@ -259,7 +259,7 @@ class Player extends GameObject {
 					// clear the speed.
 					this.dash_direction = DASH_DIRECTION_NONE;
 					if (this.velocity.y > 0)
-						this.velocity.y = 0.3;
+						this.velocity.y = 1;
 					if (this.velocity.x < 0)
 						this.velocity.x = -1.5;
 					if (this.velocity.x > 0)
@@ -567,7 +567,7 @@ class Player extends GameObject {
 			// window.alert("handle_gravity!");
 			// handle gravity
 			if (this.velocity.y > 0) {
-				if (keyboardValue.Jump) {
+				if (keyboardValue.Jump && this.velocity.y <= 2.5) {
 					this.velocity.y -= GRAVITY * 0.5;
 				}
 				else {
@@ -674,7 +674,15 @@ class Player extends GameObject {
 		this.madeline.position.x = this.box.position.x;
 		this.madeline.position.y = this.box.position.y;
 		this.madeline.position.z = this.box.position.z;
-
+		if (!this.gameRoom.paused) {
+			if (this.direction == DIRECTION_LEFT) {
+				this.madeline.rotation.z = Math.max(this.madeline.rotation.z - Math.max(0.1, 0.1 * (this.madeline.rotation.z + Math.PI * 0.5)), -Math.PI * 0.5);
+			}
+			else {
+				this.madeline.rotation.z = Math.min(this.madeline.rotation.z + Math.max(0.1, 0.1 * (Math.PI * 0.5 - this.madeline.rotation.z)), Math.PI * 0.5);
+			}
+		}
+		
 		if (this.should_be_killed) {
 			this.box.material = new THREE.MeshStandardMaterial({ color: 0x8f8f8f, transparent: true, opacity: this.box_opacity });
 		}

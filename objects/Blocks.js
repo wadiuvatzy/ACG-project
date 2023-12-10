@@ -5,6 +5,7 @@ export const BLOCK_UNIT_SIZE = 8;
 export const BLOCK_NORMAL = 0;
 export const BLOCK_WEAK = 1;
 export const BLOCK_DROP = 2;
+export const BLOCK_MOVABLE = 3;
 
 class Block extends GameObject {
 	constructor(gameRoom, initial_position, width, height) {
@@ -140,7 +141,6 @@ class WeakBlock extends Block {
 		this.box.material = new THREE.MeshStandardMaterial({ color: 0x008f00 });
 	}
 	reset() {
-		this.previous_position = this.position.clone();
 		this.position = this.initial_position.clone();
 		this.previous_position = this.position.clone();
 		this.velocity = new THREE.Vector2(0, 0);
@@ -192,4 +192,62 @@ class WeakBlock extends Block {
 }
 
 
-export { Block, WeakBlock, DropBlock };
+class ShakingBlock extends Block {
+	constructor(gameRoom, initial_position, target_position, width, height) {
+		super(gameRoom, initial_position, width, height);
+		// this.initial_position = initial_position.clone(); // left-bottom position
+		this.target_position = target_position.clone();
+		this.type = BLOCK_MOVABLE;
+
+		// Initialize the 3D object and its tiles.
+		this.box.material = new THREE.MeshStandardMaterial({ color: 0x00ffff });
+
+		this.timer = 0;
+		this.mode = 0;
+	}
+
+	getUpper(target_position = this.position) { return target_position.y + this.height; }
+	getLower(target_position = this.position) { return target_position.y; }
+	getLeft(target_position = this.position) { return target_position.x; }
+	getRight(target_position = this.position) { return target_position.x + this.width; }
+
+	reset() {
+		this.position = this.initial_position.clone();
+		this.previous_position = this.position.clone();
+		this.velocity = new THREE.Vector2(0, 0);
+		this.timer = 50;
+		this.mode = 1;
+	}
+	onStep() {
+		this.timer = this.timer + 1;
+		this.previous_position = this.position.clone();
+		if (this.timer == 80) {
+			this.mode = 1 - this.mode;
+			this.timer = 0;
+		}
+		if (this.timer <= 25) {
+			// begin * cos(pi * 0.5 * timer / 10) + end * 1 - cos(pi * 0.5 * timer / 10)
+			let alpha = Math.cos(Math.PI * this.timer / 50);
+			if (this.mode == 0) {
+
+				this.position.x = this.initial_position.x * alpha + this.target_position.x * (1 - alpha);
+				this.position.y = this.initial_position.y * alpha + this.target_position.y * (1 - alpha);
+			}
+			else {
+				this.position.x = this.initial_position.x * (1 - alpha) + this.target_position.x * alpha;
+				this.position.y = this.initial_position.y * (1 - alpha) + this.target_position.y * alpha;
+			}
+		}
+		this.velocity.x = this.position.x - this.previous_position.x;
+		this.velocity.y = this.position.y - this.previous_position.y;
+	}
+	onRender() {
+		// window.alert("renders?");
+		this.box.position.x = this.position.x + this.width * 0.5;
+		this.box.position.y = this.position.y + this.height * 0.5;
+		this.box.position.z = 0;
+	}
+}
+
+
+export { Block, WeakBlock, DropBlock, ShakingBlock };

@@ -15,7 +15,7 @@ class GameGoal extends GameObject {
 		const geometry = new THREE.SphereGeometry(this.size, 16, 16);  // To be modified
 		const material = new THREE.MeshStandardMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
 		this.sphere = new THREE.Mesh(geometry, material);
-		this.gameRoom.scene.add(this.sphere);
+		// this.gameRoom.scene.add(this.sphere);
 
 		const gltfLoader = new GLTFLoader();
 		const url = '../models3D/strawberry_from_celeste_voxel/scene.gltf';
@@ -170,6 +170,77 @@ class BouncyBall extends GameObject {
 			// set ball status
 			this.iter = 6;
 		}
+
+	}
+}
+
+
+class DashRefresher extends GameObject {
+	constructor(gameRoom, position, refresh_count = 1) {
+		super(gameRoom);
+		this.position = position.clone();
+		this.velocity = new THREE.Vector2(0, 0);
+		this.size = 6;
+		this.refresh_count = refresh_count;
+		this.timer = 0;
+		this.ready = 0;
+
+		// initialize shape
+		if (this.refresh_count == 1) {
+			const geometry = new THREE.BoxGeometry(7, 7, 7);  // To be modified
+			const material = new THREE.MeshStandardMaterial({ color: 0xc4ffc4, transparent: true, opacity: 0.8 });
+			this.box = new THREE.Mesh(geometry, material);
+		}
+		else {
+			const geometry = new THREE.BoxGeometry(9, 9, 9);  // To be modified
+			const material = new THREE.MeshStandardMaterial({ color: 0xffc3fc, transparent: true, opacity: 0.8 });
+			this.box = new THREE.Mesh(geometry, material);
+		}
+		this.box.rotation.x = Math.PI / 4;
+		this.box.rotation.y = Math.atan(Math.sqrt(2));
+		
+		this.gameRoom.scene.add(this.box);
+	}
+	reset() {
+		this.timer = 0;
+		if (this.ready > 0) {
+			this.gameRoom.scene.add(this.box);
+		}
+		this.ready = 0;
+		
+	}
+	onStep() {
+		this.timer += 1;
+		if (this.ready > 0) {
+			this.ready -= 1;
+			if (this.ready == 0) {
+				this.gameRoom.scene.add(this.box);
+			}
+		}
+	}
+	onRender() {
+		this.box.position.x = this.position.x;
+		this.box.position.y = this.position.y + 2 * Math.sin(this.timer * 0.04);
+		this.box.position.z = 0;
+	}
+	playerInteraction(player) {
+		if (this.ready > 0)
+			return;
+		// collision
+		let top = player.getUpper();
+		let bot = player.getLower();
+		let left = player.getLeft();
+		let right = player.getRight();
+
+		if (Math.max(left, this.position.x - this.size) <= Math.min(right, this.position.x + this.size)) {
+			if (Math.max(bot, this.position.y - this.size) <= Math.min(top, this.position.y + this.size)) {
+				if (player.dash_count < this.refresh_count) {
+					player.dash_count = this.refresh_count;
+					this.ready = 180;
+					this.gameRoom.scene.remove(this.box);
+				}
+			}
+		}
 	}
 }
 
@@ -177,6 +248,12 @@ class BouncyBall extends GameObject {
 export function get_special_object(gameRoom, obj) {
 	if (obj.type == "GameGoal") {
 		return new GameGoal(gameRoom, new THREE.Vector2(obj.x * BLOCK_UNIT_SIZE, obj.y * BLOCK_UNIT_SIZE));
+	}
+	else if (obj.type == "BouncyBall") {
+		return new BouncyBall(gameRoom, new THREE.Vector2(obj.x * BLOCK_UNIT_SIZE, obj.y * BLOCK_UNIT_SIZE));
+	}
+	else if (obj.type == "DashRefresher") {
+		return new DashRefresher(gameRoom, new THREE.Vector2(obj.x * BLOCK_UNIT_SIZE, obj.y * BLOCK_UNIT_SIZE), obj.refresh_count);
 	}
 	else {
 		window.alert("Error: Invalid object type!");

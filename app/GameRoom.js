@@ -122,6 +122,21 @@ class GameRoom {
 
 		this.reset();
 	}
+	init_room(room_name) {
+		levels.make_level(this, levels.NameToLevel[room_name]);
+
+		// add lights
+		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+		this.directionalLight.position.x = 10;
+		this.directionalLight.position.y = 100;
+		this.directionalLight.position.z = 20;
+		this.scene.add(this.directionalLight);
+
+		const ambientlight = new THREE.AmbientLight(0x404040); // soft white light
+		this.scene.add(ambientlight);
+
+		this.reset();
+	}
 	reset() {
 		this.player.reset();
 		for (var block of this.blocks) {
@@ -154,49 +169,37 @@ class GameRoom {
 		if (keyboardValue.ResetPressed) {
 			this.reset();
 		}
-		if (!this.paused) {
-			if (this.wins) {
-				// TODO
-				return;
-			}
-			else if (this.player.should_be_killed) {
-				// TODO (may be nothing to do here)
-				if (this.dead_waiting_reset) {
-					this.just_dead = false;
-					this.dead_waiting_reset = true;
-				}
-				else {
-					this.just_dead = true;
-					this.dead_waiting_reset = true;
-				}
-				return;
-			}
-			if (keyboardValue.PausePressed) {
-				this.paused = true;
-				return;
-			}
-			for (var block of this.blocks) {
-				block.onStep();
-			}
-			for (var spike of this.spikes) {
-				spike.onStep();
-			}
-			for (var obj of this.special_objects) {
-				obj.onStep();
-			}
-			this.player.onStep();
-
-			// camera control
-			this.camera_controller.onStep();
-		}
-		else {
+		if (this.wins) {
+			this.paused = true;
 			// TODO
-			// window.alert("Paused");
-			if (keyboardValue.PausePressed) {
-				this.paused = false;
-				return;
-			}
+			return;
 		}
+		if (this.player.should_be_killed) {
+			this.paused = true;
+			// TODO (may be nothing to do here)
+			if (this.dead_waiting_reset) {
+				this.just_dead = false;
+				this.dead_waiting_reset = true;
+			}
+			else {
+				this.just_dead = true;
+				this.dead_waiting_reset = true;
+			}
+			return;
+		}
+		for (var block of this.blocks) {
+			block.onStep();
+		}
+		for (var spike of this.spikes) {
+			spike.onStep();
+		}
+		for (var obj of this.special_objects) {
+			obj.onStep();
+		}
+		this.player.onStep();
+
+		// camera control
+		this.camera_controller.onStep();
 	}
 	// Compute the poses of objects, and then render the image.
 	Render() {
@@ -240,7 +243,12 @@ class GameRoom {
 				this.reset_text = new THREE.Mesh(geometry, material);
 				this.reset_text.position.x = this.camera.position.x;
 				this.reset_text.position.y = this.camera.position.y;
-				this.reset_text.position.z = this.camera.position.z - 100;
+				this.reset_text.position.z = this.camera.position.z / 2;
+
+				// new: change the size according to the camera position (as we might modify the height of the camera)
+				this.reset_text.scale.x = this.reset_text.position.z / 100
+				this.reset_text.scale.y = this.reset_text.position.z / 100
+				this.reset_text.scale.z = this.reset_text.position.z / 100
 				this.scene.add(this.reset_text);
 			}.bind(this));
 
