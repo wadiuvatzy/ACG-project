@@ -1,8 +1,27 @@
 import { GameObject } from '../objects';
 import * as THREE from 'three';
 import { BLOCK_UNIT_SIZE } from './Blocks';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+
 
 const SPIKE_RADIUS = 5;
+
+var spike_ball_loading = false;
+var spike_ball_loaded = false;
+var spike_ball = null;
+function load_spike_ball() {
+	if (spike_ball_loading)
+		return;
+	spike_ball_loading = true;
+	const gltfLoader = new GLTFLoader();
+	const url = '../models3D/spiked_ball/scene.gltf';
+	gltfLoader.load(url, (gltf) => {
+		spike_ball = gltf.scene;
+		window.alert("spike ball loaded!");
+	});
+	spike_ball_loaded = true;
+}
+
 
 class Spike extends GameObject {
 	constructor(gameRoom, initial_position, attached_to) {
@@ -14,8 +33,23 @@ class Spike extends GameObject {
 		this.reset();
 		// TODO: initialize the 3D object and its tiles.
 		const geometry = new THREE.SphereGeometry(this.size, 16, 16);  // To be modified
-		const material = new THREE.MeshStandardMaterial({ color: 0x7f0000 });
+		const material = new THREE.MeshStandardMaterial({ color: 0x7f0000, transparent: true, opacity: 0.4 });
 		this.sphere = new THREE.Mesh(geometry, material);
+
+		/*
+		this.spike_ball = null;
+		load_spike_ball();
+		while (!spike_ball_loaded) { }
+
+		const root = spike_ball.clone();
+		this.spike_ball = root.children[0];
+		this.spike_ball.scale.set(1, 1, 1);
+		this.gameRoom.scene.add(root);
+
+		let spike_mesh = root.getObjectByName("Projectile2HP_map1_0");
+		spike_mesh.geometry.computeBoundingBox();
+		spike_mesh.geometry.center();
+		*/
 
 		this.gameRoom.scene.add(this.sphere);
 	}
@@ -36,6 +70,11 @@ class Spike extends GameObject {
 		this.sphere.position.x = this.position.x;
 		this.sphere.position.y = this.position.y;
 		this.sphere.position.z = 0;
+		/*
+		this.spike_ball.position.x = this.box.position.x;
+		this.spike_ball.position.y = this.box.position.y;
+		this.spike_ball.position.z = this.box.position.z;
+		*/
 	}
 	playerInteraction(player) {
 		// collision

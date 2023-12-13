@@ -6,13 +6,14 @@ class App {
 	constructor() {
 		this.renderer = new THREE.WebGLRenderer();
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
+		this.renderer.shadowMap.enabled = true;
 		document.body.appendChild(this.renderer.domElement);
 
 		this.gameRoom = new GameRoom();
 		this.startRoom = new StartRoom();
 
 		this.gameRoomName = "No Room";
-		this.targetRoomName = "Tutorial_easy3";
+		this.targetRoomName = "Tutorial_hard1";
 		this.level = -1;
 	}
 	run_debug() {

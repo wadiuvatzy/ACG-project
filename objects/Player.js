@@ -13,7 +13,7 @@ export const GRAVITY = 0.25;
 const AIRJUMP_TIME_LIMIT = 5;
 const BOOST_TIME_LIMIT = 5;
 const JUMP_BOOST = 40.0 / 60
-const JUMP_SPEED_Y = 2.2;
+const JUMP_SPEED_Y = 2.3;
 
 const FORWARD_SPEED = 1.5;
 const SMALLER_RESISTANCE = 4.3 / 60;
@@ -61,10 +61,9 @@ class Player extends GameObject {
 		// for debugging, the box is also shown, but it is transparent
 		this.box_opacity = 0.8;
 		const geometry = new THREE.BoxGeometry(PLAYER_WIDTH_2D, PLAYER_HEIGHT_2D, PLAYER_WIDTH_2D);
-		const material = new THREE.MeshLambertMaterial({ color: 0xff0000, transparent: true, opacity: this.box_opacity });
+		const material = new THREE.MeshStandardMaterial({ color: 0xff0000, transparent: true, opacity: this.box_opacity });
 		this.box = new THREE.Mesh(geometry, material);
 		// this.gameRoom.scene.add(this.box);
-
 
 		//change to the 3D Model here
 		this.madeline = null;
@@ -75,7 +74,6 @@ class Player extends GameObject {
 			this.madeline = root.children[0];
 			this.madeline.scale.set(5, 5, 5);
 			this.gameRoom.scene.add(root);
-			// window.alert(dumpObject(root).join('\n'));
 			let madeline_mesh = root.getObjectByName("madeline_madeline_1_0");
 			madeline_mesh.geometry.computeBoundingBox();
 			madeline_mesh.geometry.center();
@@ -438,6 +436,9 @@ class Player extends GameObject {
 
 			// update velocity to the dash velocity
 			this.velocity = dash_velocity;
+			// if dash upwards, clear the air-jump state
+			if (this.dash_direction == DASH_DIRECTION_UP || this.dash_direction == DASH_DIRECTION_LEFT_UP || this.dash_direction == DASH_DIRECTION_RIGHT_UP)
+				this.airjump_time = 0;
 		}
 	}
 
@@ -487,33 +488,35 @@ class Player extends GameObject {
 				jumped = true;
 			}
 			else {
-				// window.alert("Consider wall jump?");
 				// consider wall-jumps
 				let could_wall_bounce = (this.dash_time_remains > 0 && this.dash_direction == DASH_DIRECTION_UP);
-				// window.alert("Consider wall bounce?");
+				let touch_left_wb = this.getCollision(new THREE.Vector2(this.position.x - 4.5, this.position.y)).length > 0;
+				let touch_right_wb = this.getCollision(new THREE.Vector2(this.position.x + 4.5, this.position.y)).length > 0;
 				if (this.direction == DIRECTION_LEFT) {
-					if (this.touch_left) {
-						if (could_wall_bounce) {
-							this.velocity.x = 2.0;
-							this.velocity.y = 1.3 * JUMP_SPEED_Y;
-						}
-						else {
-							this.velocity.x = 1.5;
-							this.velocity.y = JUMP_SPEED_Y;
-						}
+					if (touch_left_wb && could_wall_bounce) {
+						this.velocity.x = 2.0;
+						this.velocity.y = 1.65 * JUMP_SPEED_Y;
+						if (keyboardValue.Left || keyboardValue.Right)
+							this.velocity.x += JUMP_BOOST;
+						jumped = true;
+					}
+					else if (touch_right_wb && could_wall_bounce) {
+						this.velocity.x = -2.0;
+						this.velocity.y = 1.65 * JUMP_SPEED_Y;
+						if (keyboardValue.Left || keyboardValue.Right)
+							this.velocity.x -= JUMP_BOOST;
+						jumped = true;
+					}
+					else if (this.touch_left) {
+						this.velocity.x = 1.5;
+						this.velocity.y = JUMP_SPEED_Y;
 						if (keyboardValue.Left || keyboardValue.Right)
 							this.velocity.x += JUMP_BOOST;
 						jumped = true;
 					}
 					else if (this.touch_right) {
-						if (could_wall_bounce) {
-							this.velocity.x = -2.0;
-							this.velocity.y = 1.3 * JUMP_SPEED_Y;
-						}
-						else {
-							this.velocity.x = -1.5;
-							this.velocity.y = JUMP_SPEED_Y;
-						}
+						this.velocity.x = -1.5;
+						this.velocity.y = JUMP_SPEED_Y;
 						if (keyboardValue.Left || keyboardValue.Right)
 							this.velocity.x -= JUMP_BOOST;
 						jumped = true;
@@ -521,28 +524,30 @@ class Player extends GameObject {
 				}
 				else {
 					// window.alert("attach right?");
-					if (this.touch_right) {
-						if (could_wall_bounce) {
-							this.velocity.x = -2.0;
-							this.velocity.y = 1.3 * JUMP_SPEED_Y;
-						}
-						else {
-							this.velocity.x = -1.5;
-							this.velocity.y = JUMP_SPEED_Y;
-						}
+					if (touch_right_wb && could_wall_bounce) {
+						this.velocity.x = -2.0;
+						this.velocity.y = 1.6 * JUMP_SPEED_Y;
+						if (keyboardValue.Left || keyboardValue.Right)
+							this.velocity.x -= JUMP_BOOST;
+						jumped = true;
+					}
+					else if (touch_left_wb && could_wall_bounce) {
+						this.velocity.x = 2.0;
+						this.velocity.y = 1.6 * JUMP_SPEED_Y;
+						if (keyboardValue.Left || keyboardValue.Right)
+							this.velocity.x += JUMP_BOOST;
+						jumped = true;
+					}
+					else if (this.touch_right) {
+						this.velocity.x = -1.5;
+						this.velocity.y = JUMP_SPEED_Y;
 						if (keyboardValue.Left || keyboardValue.Right)
 							this.velocity.x -= JUMP_BOOST;
 						jumped = true;
 					}
 					else if (this.touch_left) {
-						if (could_wall_bounce) {
-							this.velocity.x = 2.0;
-							this.velocity.y = 1.3 * JUMP_SPEED_Y;
-						}
-						else {
-							this.velocity.x = 1.5;
-							this.velocity.y = JUMP_SPEED_Y;
-						}
+						this.velocity.x = 1.5;
+						this.velocity.y = JUMP_SPEED_Y;
 						if (keyboardValue.Left || keyboardValue.Right)
 							this.velocity.x += JUMP_BOOST;
 						jumped = true;
@@ -566,8 +571,8 @@ class Player extends GameObject {
 		if (this.dash_time_remains <= 0) { // when dashing, do not change the speed here.
 			// window.alert("handle_gravity!");
 			// handle gravity
-			if (this.velocity.y > 0) {
-				if (keyboardValue.Jump && this.velocity.y <= 2.5) {
+			if (this.velocity.y >= 0) {
+				if (keyboardValue.Jump && this.velocity.y <= 2.3) {
 					this.velocity.y -= GRAVITY * 0.5;
 				}
 				else {
@@ -582,6 +587,9 @@ class Player extends GameObject {
 					if (keyboardValue.Down && this.velocity.y < -2.0) {
 						this.velocity.y = Math.max(this.velocity.y - GRAVITY * 2.0, target_speed);
 					}
+					else if (this.velocity.y >= -0.5 && keyboardValue.Jump) {
+						this.velocity.y = Math.max(this.velocity.y - GRAVITY * 0.5, target_speed);
+					}
 					else {
 						this.velocity.y = Math.max(this.velocity.y - GRAVITY, target_speed);
 					}
@@ -589,6 +597,9 @@ class Player extends GameObject {
 				else {
 					this.velocity.y = Math.min(this.velocity.y + GRAVITY * 2.0, target_speed);
 				}
+			}
+			else {
+				this.velocity.y = 0;
 			}
 			// handle frictions
 			// console.log(keyboardValue.Right);
