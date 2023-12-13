@@ -123,6 +123,7 @@ class GameRoom {
 		this.reset();
 	}
 	init_room(room_name) {
+		this.scene = new THREE.Scene();
 		levels.make_level(this, levels.NameToLevel[room_name]);
 
 		// add lights
@@ -162,6 +163,7 @@ class GameRoom {
 		this.directionalLight.position.z = 20;
 		this.scene.add(this.directionalLight);
 		this.scene.remove(this.reset_text);
+		this.scene.remove(this.quit_text);
 	}
 	// Given the time elapsed and keyboard inputs, compute the next state.
 	Step() {
@@ -222,36 +224,23 @@ class GameRoom {
 			this.directionalLight.position.z = 20;
 			this.scene.add(this.directionalLight);
 
-			// add text to tell player to press R to reset
-			this.scene.remove(this.reset_text);
-			const loader = new FontLoader();
-			loader.load('../fonts/helvetiker_regular.typeface.json', function (font) {
-				var geometry = new TextGeometry("Press R to reset", {
-					font: font,
-					size: 12,
-					height: 1,
-					bevelEnabled: true,
-					bevelThickness: 0.5,
-					bevelSize: 0.3,
-					bevelSegments: 0.5
-				});
-				geometry.computeBoundingBox();
-				geometry.center();
-				var material = new THREE.MeshStandardMaterial({ color: 0x00ffff });
-				material.emissive = new THREE.Color(0x00ffff);
-				material.emissiveIntensity = 0.5;
-				this.reset_text = new THREE.Mesh(geometry, material);
-				this.reset_text.position.x = this.camera.position.x;
-				this.reset_text.position.y = this.camera.position.y;
-				this.reset_text.position.z = this.camera.position.z / 2;
+			var texture = new THREE.TextureLoader().load("../textures/Rreset.png");
+			var geometry = new THREE.PlaneGeometry(123.5, 23);
+			var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.5 });
+			this.reset_text = new THREE.Mesh(geometry, material);
+			this.reset_text.position.x = this.camera.position.x;
+			this.reset_text.position.y = this.camera.position.y + 20;
+			this.reset_text.position.z = this.camera.position.z / 2;
+			this.scene.add(this.reset_text);
 
-				// new: change the size according to the camera position (as we might modify the height of the camera)
-				this.reset_text.scale.x = this.reset_text.position.z / 100
-				this.reset_text.scale.y = this.reset_text.position.z / 100
-				this.reset_text.scale.z = this.reset_text.position.z / 100
-				this.scene.add(this.reset_text);
-			}.bind(this));
-
+			var texture = new THREE.TextureLoader().load("../textures/ESCquit.png");
+			var geometry = new THREE.PlaneGeometry(123.5, 23);
+			var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.5 });
+			this.quit_text = new THREE.Mesh(geometry, material);
+			this.quit_text.position.x = this.camera.position.x;
+			this.quit_text.position.y = this.camera.position.y - 20;
+			this.quit_text.position.z = this.camera.position.z / 2;
+			this.scene.add(this.quit_text);
 		}
 	}
 }

@@ -3,6 +3,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import * as utils from '../utils';
 import * as game_objects from '../objects';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 class StartRoom {
 	constructor() {
@@ -10,6 +11,9 @@ class StartRoom {
 		this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 		this.current_level = 0;
+		this.current_level_angle = 0;
+		this.target_level_angle = 0;
+		this.already_level_angle = 0;
 		this.level_blocks = [];
 		this.create_scene();
 		this.keyValue = null; // 1 for left, 2 for right
@@ -26,74 +30,121 @@ class StartRoom {
 		const ambientlight = new THREE.AmbientLight(0x404040); // soft white light
 		this.scene.add(ambientlight);
 
-		// for debugging
-		var points = [];
-		points.push(new THREE.Vector3(0, 0, 0));
-		points.push(new THREE.Vector3(0, 100, 0));
-		points.push(new THREE.Vector3(100, 0, 0));
-		var geometry = new THREE.BufferGeometry().setFromPoints(points);
-		var material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-		var line = new THREE.Line(geometry, material);
-		this.scene.add(line);
 
 		this.camera.position.x = 0;
 		this.camera.position.y = 0;
 		this.camera.position.z = 100;
 
-		this.welcome_text = null;
-		this.welcome_text_timer = 0;
-		const loader = new FontLoader();
-		loader.load('../fonts/helvetiker_regular.typeface.json', function (font) {
-			var geometry = new TextGeometry('Welcome!', {
-				font: font,
-				size: 20,
-				height: 2,
-				curveSegments: 3,
-				bevelEnabled: true,
-				bevelThickness: 2,
-				bevelSize: 2,
-				bevelSegments: 1
-			});
-			geometry.computeBoundingBox();
-			geometry.center();
-			var material = new THREE.MeshStandardMaterial({ color: 0x00ffff });
-			this.welcome_text = new THREE.Mesh(geometry, material);
-			this.scene.add(this.welcome_text);
-		}.bind(this));
+		const loader = new THREE.TextureLoader();
+		var texture = loader.load('../textures/3Deleste.png');
+		var geometry = new THREE.PlaneGeometry(100, 35, 32);
+		var material = new THREE.MeshBasicMaterial({ map: texture, alphaTest: 0, transparent: true });
+		var plane = new THREE.Mesh(geometry, material);
+		plane.position.x = 0;
+		plane.position.y = 50;
+		plane.position.z = 0;
+		this.scene.add(plane);
 
+		texture = loader.load('../textures/select_levels.png');
+		var geometry = new THREE.PlaneGeometry(122, 14, 32);
+		var material = new THREE.MeshBasicMaterial({ map: texture, alphaTest: 0, transparent: true });
+		var plane = new THREE.Mesh(geometry, material);
+		plane.position.x = 0;
+		plane.position.y = -55;
+		plane.position.z = 0;
+		this.scene.add(plane);
+
+		texture = loader.load('../textures/strawberry.png');
+		var geometry = new THREE.PlaneGeometry(10, 10, 32);
+		var material = new THREE.MeshBasicMaterial({ map: texture, alphaTest: 0, transparent: true });
+		this.strawberry_plane = new THREE.Mesh(geometry, material);
+		this.strawberry_plane.position.x = 35;
+		this.strawberry_plane.position.y = 52;
+		this.strawberry_plane.position.z = 0;
+		this.scene.add(this.strawberry_plane);
+		this.time = 0;
+
+		// create level textures
+		this.level_textures = [];
+		var temp = ['1', '2', '3', '4__'];
+		for (var i = 0; i < 4; i++) {
+			texture = loader.load(`../textures/level_entrance/${temp[i]}.png`);
+			texture.encoding = THREE.sRGBEncoding;
+			this.level_textures.push(texture);
+		}
+		this.level_radius = 18
+		this.level_angles = []
+		for (var i = 0; i < 4; i++) {
+			this.level_angles.push(i * Math.PI / 2)
+		}
 		// create level boxes
-		for (var i = 0; i < 3; i++) {
-			var geometry = new THREE.BoxGeometry(20, 20, 20);
-			var material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+		for (var i = 0; i < 4; i++) {
+			var geometry = new THREE.PlaneGeometry(20, 20, 32);
+			texture = this.level_textures[i]
+			if (i == this.current_level) {
+				material = new THREE.MeshStandardMaterial({ map: texture, alphaTest: 0.8, transparent: true, emissiveMap: texture, emissiveIntensity: 1.0, emissive: 0xffffff });
+			}
+			else {
+				material = new THREE.MeshStandardMaterial({ map: texture, alphaTest: 0.8, transparent: true });
+			}
 			var cube = new THREE.Mesh(geometry, material);
-			cube.position.x = i * 30 - 30;
+			cube.position.x = 0 + 2 * this.level_radius * Math.sin(this.level_angles[i])
 			cube.position.y = -30;
-			cube.position.z = 0;
+			cube.position.z = 0 + this.level_radius * Math.cos(this.level_angles[i])
 			this.scene.add(cube);
 			this.level_blocks.push(cube);
 		}
-		this.scene.background = new THREE.TextureLoader().load('../textures/background.jpg');
+
+		// background
+		var geometry = new THREE.PlaneGeometry(480, 270, 32);
+		// 预加载所有纹理
+		this.textureLoader = new THREE.TextureLoader();
+		this.background_textures = [];
+
+		// 预加载所有纹理
+		for (let i = 0; i < 18; i++) {
+			let texture = this.textureLoader.load(`../textures/startroom_background/${i}.png`);
+			texture.encoding = THREE.sRGBEncoding;
+			this.background_textures.push(texture);
+		}
+		var material = new THREE.MeshBasicMaterial({ map: this.background_textures[0] })
+		this.background_index = 0;
+		this.background_plane = new THREE.Mesh(geometry, material);
+		this.background_plane.position.x = 0;
+		this.background_plane.position.y = 0;
+		this.background_plane.position.z = -40;
+		this.scene.add(this.background_plane);
+		// this.scene.background = new THREE.TextureLoader().load('../textures/startroom_background/0.png');
 
 	}
 	reset() {
 
 	}
 	Step() {
-		// move welcome text
-		this.welcome_text_timer += 1;
-		this.welcome_text.position.x = 0;
-		this.welcome_text.position.y = 50 + Math.sin(this.welcome_text_timer * 0.015) * 5;
+		this.time += 1;
+		this.strawberry_plane.position.z = 3 + Math.sin(this.time / 50) * 1.5;
+		this.background_plane.position.x = Math.sin(this.time / 149) * 5;
+		this.background_plane.position.y = Math.sin(this.time / 351) * 10;
+
+		if (this.time % 12 == 0) {
+			this.background_index = (this.background_index + 1) % 18;
+			var material = new THREE.MeshBasicMaterial({ map: this.background_textures[this.background_index] })
+			this.background_plane.material = material;
+		}
+
 
 		// move level blocks
 		var keyboardValue = utils.getKeyboardValue();
 		if (keyboardValue.Left) {
 			if (this.press_timer == 0 || this.keyValue != 1) {
-				this.current_level = (this.current_level + 2) % 3;
+				this.current_level = (this.current_level + 3) % 4;
+				this.target_level_angle += Math.PI / 2;
 				this.keyValue = 1;
 				this.press_timer = 0;
 			}
 			else if (this.press_timer == 11 && this.keyValue == 1) {
-				this.current_level = (this.current_level + 2) % 3;
+				this.current_level = (this.current_level + 3) % 4;
+				this.target_level_angle += Math.PI / 2;
 				this.press_timer = 0;
 			}
 			this.press_timer += 1;
@@ -101,12 +152,14 @@ class StartRoom {
 		}
 		else if (keyboardValue.Right) {
 			if (this.press_timer == 0 || this.keyValue != 2) {
-				this.current_level = (this.current_level + 1) % 3;
+				this.current_level = (this.current_level + 1) % 4;
+				this.target_level_angle -= Math.PI / 2;
 				this.keyValue = 2;
 				this.press_timer = 0;
 			}
 			else if (this.press_timer == 11 && this.keyValue == 2) {
-				this.current_level = (this.current_level + 1) % 3;
+				this.current_level = (this.current_level + 1) % 4;
+				this.target_level_angle -= Math.PI / 2;
 				this.press_timer = 0;
 			}
 			this.press_timer += 1;
@@ -119,15 +172,49 @@ class StartRoom {
 		else {
 			this.press_timer = 0;
 		}
-		for (var i = 0; i < 3; i++) {
+		// control the rotation of the level blocks
+		var x = Math.PI / 10
+		if (Math.abs(this.target_level_angle - this.current_level_angle) >= Math.pi / 2) {
+			this.current_level_angle += x * Math.sign(this.target_level_angle - this.current_level_angle)
+		}
+		else {
+			this.current_level_angle += x * Math.sin(this.target_level_angle - this.current_level_angle)
+		}
+
+		if (this.current_level_angle >= Math.PI / 2) {
+			if (Math.abs(this.target_level_angle - this.current_level_angle) < Math.pi / 3) {
+				this.current_level_angle = Math.PI / 2;
+			}
+		}
+		if (this.current_level_angle <= -Math.PI / 2) {
+			if (Math.abs(this.target_level_angle - this.current_level_angle) < Math.pi / 3) {
+				this.current_level_angle = -Math.PI / 2;
+			}
+		}
+		var step = this.current_level_angle - this.already_level_angle;
+
+		if (this.current_level_angle >= Math.PI / 2) {
+			this.current_level_angle -= Math.PI / 2;
+			this.target_level_angle -= Math.PI / 2;
+		}
+		if (this.current_level_angle <= -Math.PI / 2) {
+			this.current_level_angle += Math.PI / 2;
+			this.target_level_angle += Math.PI / 2;
+		}
+		this.already_level_angle = this.current_level_angle;
+
+		for (var i = 0; i < 4; i++) {
+			this.level_angles[i] += step;
+			var texture = this.level_textures[i];
 			if (i == this.current_level) {
-				this.level_blocks[i].position.z = 10;
-				this.level_blocks[i].material = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+				this.level_blocks[i].material = new THREE.MeshStandardMaterial({ map: texture, alphaTest: 0.8, transparent: true, emissiveMap: texture, emissiveIntensity: 1.0, emissive: 0xffffff });
 			}
 			else {
-				this.level_blocks[i].position.z = 0;
-				this.level_blocks[i].material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+				this.level_blocks[i].material = new THREE.MeshStandardMaterial({ map: texture, alphaTest: 0.8, transparent: true });
 			}
+			this.level_blocks[i].position.x = 0 + 2 * this.level_radius * Math.sin(this.level_angles[i])
+			this.level_blocks[i].position.y = -30;
+			this.level_blocks[i].position.z = 0 + this.level_radius * Math.cos(this.level_angles[i])
 		}
 
 		return -1;
