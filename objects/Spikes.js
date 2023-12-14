@@ -9,6 +9,14 @@ const SPIKE_RADIUS = 5;
 var spike_ball_loading = false;
 var spike_ball_loaded = false;
 var spike_ball = null;
+
+const gltfLoader = new GLTFLoader();
+const url = '../models3D/spiked_ball/scene.gltf';
+gltfLoader.load(url, (gltf) => {
+	spike_ball = gltf.scene;
+	spike_ball.scale.set(0.2, 0.2, 0.2);
+});
+
 function load_spike_ball() {
 	if (spike_ball_loading)
 		return;
@@ -51,6 +59,10 @@ class Spike extends GameObject {
 		spike_mesh.geometry.center();
 		*/
 
+		// change to the 3D model here (copy spike_ball)
+		this.spike3D = spike_ball.clone();
+		this.gameRoom.scene.add(this.spike3D);
+
 		this.gameRoom.scene.add(this.sphere);
 	}
 	reset() {
@@ -70,6 +82,9 @@ class Spike extends GameObject {
 		this.sphere.position.x = this.position.x;
 		this.sphere.position.y = this.position.y;
 		this.sphere.position.z = 0;
+		this.spike3D.position.x = this.position.x;
+		this.spike3D.position.y = this.position.y;
+		this.spike3D.position.z = 0
 		/*
 		this.spike_ball.position.x = this.box.position.x;
 		this.spike_ball.position.y = this.box.position.y;

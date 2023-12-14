@@ -135,6 +135,8 @@ class GameRoom {
 
 		const ambientlight = new THREE.AmbientLight(0x404040); // soft white light
 		this.scene.add(ambientlight);
+		this.scene.remove(this.reset_text);
+		this.scene.remove(this.quit_text);
 
 		this.reset();
 	}
