@@ -3,6 +3,7 @@ import { lv_Tutorial_easy1 } from "./lv_Tutorial_easy1.js";
 import { lv_Tutorial_easy2 } from "./lv_Tutorial_easy2.js";
 import { lv_Tutorial_easy3 } from "./lv_Tutorial_easy3.js";
 import { lv_Tutorial_hard1 } from "./lv_Tutorial_hard1.js";
+import { lv_Tutorial_hard2 } from "./lv_Tutorial_hard2.js";
 
 export { make_level } from "./make_level.js";
 
@@ -17,5 +18,6 @@ export const NameToLevel = {
 	"Tutorial_easy1": lv_Tutorial_easy1,
 	"Tutorial_easy2": lv_Tutorial_easy2,
 	"Tutorial_easy3": lv_Tutorial_easy3,
-	"Tutorial_hard1": lv_Tutorial_hard1
+	"Tutorial_hard1": lv_Tutorial_hard1,
+	"Tutorial_hard2": lv_Tutorial_hard2,
 }

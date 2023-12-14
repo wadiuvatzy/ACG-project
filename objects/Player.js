@@ -103,6 +103,7 @@ class Player extends GameObject {
 		this.dash_cd = 0; // when > 0, cannot dash.
 		this.dash_refresh_cd = 0; // when > 0, cannot refresh on the block.
 		this.dash_time_remains = 0; // The remaining seconds for 'dash-time'.
+		this.dash_time_remains_for_wb = 0;
 		this.dash_direction = DASH_DIRECTION_NONE;
 
 		// for jumping
@@ -265,6 +266,9 @@ class Player extends GameObject {
 				}
 			}
 		}
+		if (this.dash_time_remains_for_wb > 0) {
+			this.dash_time_remains_for_wb = this.dash_time_remains_for_wb - 1;
+		}
 
 		// parse speeds from nearby objects
 		// standing on
@@ -368,6 +372,7 @@ class Player extends GameObject {
 			this.dash_cd = DASH_CD;
 			this.dash_refresh_cd = DASH_REFRESH_CD;
 			this.dash_time_remains = DASH_TIME;
+			this.dash_time_remains_for_wb = DASH_TIME + 2;
 			this.dash_count = this.dash_count - 1;
 
 			// perform dash
@@ -489,20 +494,20 @@ class Player extends GameObject {
 			}
 			else {
 				// consider wall-jumps
-				let could_wall_bounce = (this.dash_time_remains > 0 && this.dash_direction == DASH_DIRECTION_UP);
+				let could_wall_bounce = (this.dash_time_remains_for_wb > 0 && this.dash_direction == DASH_DIRECTION_UP);
 				let touch_left_wb = this.getCollision(new THREE.Vector2(this.position.x - 4.5, this.position.y)).length > 0;
 				let touch_right_wb = this.getCollision(new THREE.Vector2(this.position.x + 4.5, this.position.y)).length > 0;
 				if (this.direction == DIRECTION_LEFT) {
 					if (touch_left_wb && could_wall_bounce) {
-						this.velocity.x = 2.0;
-						this.velocity.y = 1.65 * JUMP_SPEED_Y;
+						this.velocity.x = 2.2;
+						this.velocity.y = 2.15 * JUMP_SPEED_Y;
 						if (keyboardValue.Left || keyboardValue.Right)
 							this.velocity.x += JUMP_BOOST;
 						jumped = true;
 					}
 					else if (touch_right_wb && could_wall_bounce) {
-						this.velocity.x = -2.0;
-						this.velocity.y = 1.65 * JUMP_SPEED_Y;
+						this.velocity.x = -2.2;
+						this.velocity.y = 2.15 * JUMP_SPEED_Y;
 						if (keyboardValue.Left || keyboardValue.Right)
 							this.velocity.x -= JUMP_BOOST;
 						jumped = true;
@@ -525,15 +530,15 @@ class Player extends GameObject {
 				else {
 					// window.alert("attach right?");
 					if (touch_right_wb && could_wall_bounce) {
-						this.velocity.x = -2.0;
-						this.velocity.y = 1.6 * JUMP_SPEED_Y;
+						this.velocity.x = -2.2;
+						this.velocity.y = 2.15 * JUMP_SPEED_Y;
 						if (keyboardValue.Left || keyboardValue.Right)
 							this.velocity.x -= JUMP_BOOST;
 						jumped = true;
 					}
 					else if (touch_left_wb && could_wall_bounce) {
-						this.velocity.x = 2.0;
-						this.velocity.y = 1.6 * JUMP_SPEED_Y;
+						this.velocity.x = 2.2;
+						this.velocity.y = 2.15 * JUMP_SPEED_Y;
 						if (keyboardValue.Left || keyboardValue.Right)
 							this.velocity.x += JUMP_BOOST;
 						jumped = true;
@@ -562,6 +567,7 @@ class Player extends GameObject {
 			this.standing_on = null;
 			// no matter which kind of jump it is, the dash time must be cleared.
 			this.dash_time_remains = 0;
+			this.dash_time_remains_for_wb = 0;
 			this.dash_refresh_cd = Math.min(this.dash_refresh_cd, 2);
 		}
 	}

@@ -4,7 +4,7 @@ import { BLOCK_UNIT_SIZE } from './Blocks';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 
-const SPIKE_RADIUS = 5;
+const SPIKE_RADIUS = 6;
 
 var spike_ball_loading = false;
 var spike_ball_loaded = false;
@@ -14,7 +14,7 @@ const gltfLoader = new GLTFLoader();
 const url = '../models3D/spiked_ball/scene.gltf';
 gltfLoader.load(url, (gltf) => {
 	spike_ball = gltf.scene;
-	spike_ball.scale.set(0.2, 0.2, 0.2);
+	spike_ball.scale.set(0.25, 0.25, 0.25);
 });
 
 function load_spike_ball() {

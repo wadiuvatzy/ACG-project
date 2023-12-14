@@ -1,5 +1,6 @@
 import { GameObject, GRAVITY, BLOCK_UNIT_SIZE } from '../objects';
 import * as THREE from 'three';
+import * as utils from '../utils';
 import { DASH_DIRECTION_NONE, DIRECTION_LEFT, DIRECTION_RIGHT } from './Player';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
@@ -82,20 +83,29 @@ class GameGoal extends GameObject {
 }
 
 
-const BallScaleList = [1, 1.1, 1.23, 1.35, 1.4, 1.1, 0.8];
+const BallScaleList = [1, 1.05, 1.1, 1.15, 1.1, 0.9, 0.7];
 
 class BouncyBall extends GameObject {
 	constructor(gameRoom, position) {
 		super(gameRoom);
 		this.position = position.clone();
 		this.velocity = new THREE.Vector2(0, 0);
-		this.size = BLOCK_UNIT_SIZE;
+		this.size = BLOCK_UNIT_SIZE + 3;
 
 		// initialize shape
+		const textureLoader = new THREE.TextureLoader();
+		const image = textureLoader.load('./textures/pumber2.png');
+		// image.encoding = THREE.sRGBEncoding;
 		const geometry = new THREE.SphereGeometry(this.size, 16, 16);  // To be modified
-		const material = new THREE.MeshStandardMaterial({ color: 0x0000ff });
+		const rotation_matrix = new THREE.Matrix4();
+		rotation_matrix.makeRotationY(-Math.PI / 2);
+		geometry.applyMatrix4(rotation_matrix);
+		const material = new THREE.MeshStandardMaterial({ map: image, emissiveMap: image, emissiveIntensity: 0.8, emissive: 0xffffff });
+		// const material = new THREE.MeshStandardMaterial();
 		this.sphere = new THREE.Mesh(geometry, material);
+		this.original_geometry = this.sphere.geometry.clone();
 		this.gameRoom.scene.add(this.sphere);
+		this.touch_direction = new THREE.Vector2(0, 1);
 
 		this.iter = 0;
 	}
@@ -110,9 +120,14 @@ class BouncyBall extends GameObject {
 		this.sphere.position.z = 0;
 		// window.alert([this.sphere.position.x, this.sphere.position.y, this.sphere.position.z]);
 
+		/*
 		this.sphere.scale.x = BallScaleList[this.iter];
 		this.sphere.scale.y = BallScaleList[this.iter];
 		this.sphere.scale.z = BallScaleList[this.iter];
+		*/
+		this.sphere.geometry = this.original_geometry.clone();
+		const compression_matrix = utils.get_compress_matrix(this.touch_direction, BallScaleList[this.iter], true);
+		this.sphere.geometry.applyMatrix4(compression_matrix);
 	}
 	playerInteraction(player) {
 		// collision
@@ -147,12 +162,13 @@ class BouncyBall extends GameObject {
 			player.dash_cd = 6;
 			player.dash_refresh_cd = 0;
 			player.dash_time_remains = 0;
+			player.dash_time_remains_for_wb = 0;
 			player.dash_direction = DASH_DIRECTION_NONE;
 			player.dash_count = Math.max(player.dash_count, player.max_dash_count);
 
 			// set player speed
 			let vx = player.position.x - this.position.x;
-			let vy = player.position.y - this.position.y;
+			let vy = player.position.y + 5 - this.position.y;
 			let norm = Math.sqrt(vx * vx + vy * vy);
 			vx = vx * 325 / norm / 60;
 			vy = vy * 325 / norm / 60;
@@ -169,8 +185,8 @@ class BouncyBall extends GameObject {
 
 			// set ball status
 			this.iter = 6;
+			this.touch_direction = new THREE.Vector2(vx, vy);
 		}
-
 	}
 }
 

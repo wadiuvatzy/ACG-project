@@ -173,6 +173,7 @@ class WeakBlock extends Block {
 		this.Breaks();
 		// stop dashing
 		player.dash_time_remains = 0;
+		player.dash_time_remains_for_wb = 0;
 		player.dash_direction = 0;
 		player.velocity.y = 1.6;
 		if (player.velocity.x > 0)

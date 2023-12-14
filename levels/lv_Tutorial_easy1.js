@@ -15,16 +15,12 @@ export const lv_Tutorial_easy1 = {
 		{ "type": "Block", "x": -2, "y": 14, "w": 23, "h": 2}
 	],
 	"spikes": [
-		{ "type": "Spike", "x": 4, "y": -4, "attached_to": null },
-		{ "type": "Spike", "x": 5, "y": -4, "attached_to": null },
-		{ "type": "Spike", "x": 6, "y": -4, "attached_to": null },
+		{ "type": "Spike", "x": 4.25, "y": -4, "attached_to": null },
+		{ "type": "Spike", "x": 5.75, "y": -4, "attached_to": null },
 
-		{ "type": "Spike", "x": 10, "y": -4, "attached_to": null },
 		{ "type": "Spike", "x": 11, "y": -4, "attached_to": null },
-		{ "type": "Spike", "x": 12, "y": -4, "attached_to": null },
-		{ "type": "Spike", "x": 13, "y": -4, "attached_to": null },
+		{ "type": "Spike", "x": 12.5, "y": -4, "attached_to": null },
 		{ "type": "Spike", "x": 14, "y": -4, "attached_to": null },
-		{ "type": "Spike", "x": 15, "y": -4, "attached_to": null }
 	],
 	"special_objects": [
 		{ "type": "GameGoal", "x": 17.5, "y": 4 }

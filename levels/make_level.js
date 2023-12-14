@@ -36,8 +36,10 @@ function create_spike(gameRoom, data) {
 	
 	if (type == "Spike") {
 		let attached_to = data.attached_to;
-		if (attached_to != null)
+		if (attached_to != null) {
 			attached_to = gameRoom.blocks[attached_to];
+			// window.alert(attached_to.type);
+		}
 		gameRoom.spikes.push(new game_objects.Spike(gameRoom, position, attached_to));
 	}
 	else if (type == "DeadlyBlock")
