@@ -85,6 +85,17 @@ class GameRoom {
 		this.dead_waiting_reset = false;
 		this.just_dead = false;
 		this.camera_controller = new CameraController(this);
+
+		// images for reset/quit
+		var texture = new THREE.TextureLoader().load("../textures/Rreset.png");
+		var geometry = new THREE.PlaneGeometry(123.5, 23);
+		var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.5 });
+		this.reset_text = new THREE.Mesh(geometry, material);
+		
+		var texture = new THREE.TextureLoader().load("../textures/ESCquit.png");
+		var geometry = new THREE.PlaneGeometry(123.5, 23);
+		var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.5 });
+		this.quit_text = new THREE.Mesh(geometry, material);
 	}
 	init_debug() {
 		/*
@@ -157,6 +168,7 @@ class GameRoom {
 		this.paused = false;
 		this.wins = false;
 		this.dead_waiting_reset = false;
+		this.just_dead = false;
 
 		this.scene.remove(this.directionalLight)
 		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -226,19 +238,11 @@ class GameRoom {
 			this.directionalLight.position.z = 20;
 			this.scene.add(this.directionalLight);
 
-			var texture = new THREE.TextureLoader().load("../textures/Rreset.png");
-			var geometry = new THREE.PlaneGeometry(123.5, 23);
-			var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.5 });
-			this.reset_text = new THREE.Mesh(geometry, material);
 			this.reset_text.position.x = this.camera.position.x;
 			this.reset_text.position.y = this.camera.position.y + 20;
 			this.reset_text.position.z = this.camera.position.z / 2;
 			this.scene.add(this.reset_text);
 
-			var texture = new THREE.TextureLoader().load("../textures/ESCquit.png");
-			var geometry = new THREE.PlaneGeometry(123.5, 23);
-			var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.5 });
-			this.quit_text = new THREE.Mesh(geometry, material);
 			this.quit_text.position.x = this.camera.position.x;
 			this.quit_text.position.y = this.camera.position.y - 20;
 			this.quit_text.position.z = this.camera.position.z / 2;

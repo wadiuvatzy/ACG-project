@@ -48,6 +48,98 @@ function dumpObject(obj, lines = [], isLast = true, prefix = '') {
 	return lines;
 }
 
+class DashEffect {
+	constructor(gameRoom) {
+		this.gameRoom = gameRoom;
+		const material = new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: 0.8, emissiveIntensity: 0.8, emissive: 0xffffff });
+		const geometry = new THREE.BoxGeometry(1, 1, 1);
+		this.box = new THREE.Mesh(geometry, material);
+		this.velocity = new THREE.Vector3(0, 0, 0);
+		this.rotation_v = new THREE.Vector3(0, 0, 0);
+		this.time_remains = 0;
+		this.in_scene = false;
+		this.gameRoom.scene.add(this.box);
+		this.box.position.x = -800;
+		this.box.position.y = -800;
+		this.need_to_define_velocity = false;
+		this.initial_position = new THREE.Vector2(0, 0);
+	}
+	generate(position, velocity) {
+		this.initial_position = position.clone();
+		this.need_to_define_velocity = true;
+
+		this.in_scene = true;
+		this.time_remains = Math.random() * 30 + 5;
+
+		this.box.position.x = position.x + Math.random() * 10 - 5;
+		this.box.position.y = position.y + 6 + Math.random() * 10 - 5;
+		this.box.position.z = Math.random() * 10 - 5;
+
+		this.box.rotation.x = Math.random() * Math.PI * 2;
+		this.box.rotation.y = Math.random() * Math.PI * 2;
+		this.box.rotation.z = Math.random() * Math.PI * 2;
+
+		this.rotation_v = new THREE.Vector3(Math.random() * 0.1 - 0.05, Math.random() * 0.1 - 0.05, Math.random() * 0.1 - 0.05);
+		
+		let obj_scale = Math.random() * 1.0 + 1.0;
+		this.box.scale.x = obj_scale;
+		this.box.scale.y = obj_scale;
+		this.box.scale.z = obj_scale;
+		this.box.material = new THREE.MeshStandardMaterial({ color: 0xafafff, transparent: true, opacity: this.time_remains / 35, emissiveIntensity: 0.8, emissive: 0xafafff });
+	}
+	reset() {
+		this.box.position.x = -800;
+		this.box.position.y = -800;
+		this.in_scene = false;
+		this.time_remains = 0;
+
+		this.need_to_define_velocity = false;
+		this.initial_position = new THREE.Vector2(0, 0);
+	}
+	step(position) {
+		if (this.in_scene) {
+			this.time_remains = this.time_remains - 1;
+			if (this.time_remains <= 0) {
+				this.in_scene = false;
+				this.time_remains = 0;
+				// this.gameRoom.remove(this.box);
+				this.box.position.x = -800;
+				this.box.position.y = -800;
+				return;
+			}
+
+			// set velocity according to the actual position
+			if (this.need_to_define_velocity) {
+				this.need_to_define_velocity = false;
+				let velocity = new THREE.Vector2(position.x - this.initial_position.x, position.y - this.initial_position.y);
+
+				let norm = velocity.length();
+				let scale = Math.random() * 0.6 + 0.2;
+				this.velocity.x = (Math.random() * norm - norm * 0.5) * 0.2 + scale * velocity.x;
+				this.velocity.y = (Math.random() * norm - norm * 0.5) * 0.2 + scale * velocity.y;
+				this.velocity.z = (Math.random() * norm - norm * 0.5) * 0.2;
+			}
+
+			this.box.position.x = this.box.position.x + this.velocity.x;
+			this.box.position.y = this.box.position.y + this.velocity.y;
+			this.box.position.z = this.box.position.z + this.velocity.z;
+			this.box.rotation.x = this.box.rotation.x + this.rotation_v.x;
+			this.box.rotation.y = this.box.rotation.y + this.rotation_v.y;
+			this.box.rotation.z = this.box.rotation.z + this.rotation_v.z;
+			this.box.scale.x *= 0.97;
+			this.box.scale.y *= 0.97;
+			this.box.scale.z *= 0.97;
+			this.box.material = new THREE.MeshStandardMaterial({ color: 0xafafff, transparent: true, opacity: this.time_remains / 35, emissiveIntensity: 0.8, emissive: 0xafafff })
+			this.velocity.x *= 0.9;
+			this.velocity.y *= 0.9;
+			this.velocity.z *= 0.9;
+			this.rotation_v.x *= 0.9;
+			this.rotation_v.y *= 0.9;
+			this.rotation_v.z *= 0.9;
+		}
+	}
+}
+
 class Player extends GameObject {
 
 	constructor(gameRoom, initial_position, initial_direction = DIRECTION_RIGHT) {
@@ -78,6 +170,13 @@ class Player extends GameObject {
 			madeline_mesh.geometry.computeBoundingBox();
 			madeline_mesh.geometry.center();
 		})
+
+		this.max_dash_effects = 20;
+		this.dash_effects = [];
+		for (let i = 0; i < this.max_dash_effects; i++) {
+			this.dash_effects.push(new DashEffect(this.gameRoom));
+		}
+		this.dash_effect_iter = 0;
 
 		// initialize the other attributes.
 		this.reset();
@@ -123,6 +222,26 @@ class Player extends GameObject {
 		this.touch_right = false;
 
 		this.should_be_killed = false;
+
+		// visual effects
+		for (let i = 0; i < this.max_dash_effects; i++)
+			this.dash_effects[i].reset();
+	}
+
+	updateVisualEffects() {
+		for (let i = 0; i < this.max_dash_effects; i++)
+			this.dash_effects[i].step(this.position);
+	}
+
+	createDashEffects() {
+		let count = Math.round(Math.random() * 4 + 5);
+		for (let i = 0; i < count; i++) {
+			this.dash_effects[this.dash_effect_iter].generate(this.position);
+
+			this.dash_effect_iter += 1;
+			if (this.dash_effect_iter >= this.max_dash_effects)
+				this.dash_effect_iter = 0;
+		}
 	}
 
 	// which blocks the player collides when on that position.
@@ -258,7 +377,7 @@ class Player extends GameObject {
 					// clear the speed.
 					this.dash_direction = DASH_DIRECTION_NONE;
 					if (this.velocity.y > 0)
-						this.velocity.y = 1;
+						this.velocity.y = this.velocity.y * 0.3;
 					if (this.velocity.x < 0)
 						this.velocity.x = -1.5;
 					if (this.velocity.x > 0)
@@ -401,7 +520,7 @@ class Player extends GameObject {
 						this.can_hyper = true;
 						this.dash_direction = DASH_DIRECTION_LEFT_DOWN;
 						dash_velocity.x = -DASH_VELOCITY_BASE / 1.2;
-						dash_velocity.y = -DASH_VELOCITY_BASE / 1.2;
+						dash_velocity.y = -DASH_VELOCITY_BASE / 1.35;
 					}
 					else {
 						this.dash_direction = DASH_DIRECTION_LEFT;
@@ -419,7 +538,7 @@ class Player extends GameObject {
 						this.can_hyper = true;
 						this.dash_direction = DASH_DIRECTION_RIGHT_DOWN;
 						dash_velocity.x = DASH_VELOCITY_BASE / 1.2;
-						dash_velocity.y = -DASH_VELOCITY_BASE / 1.2;
+						dash_velocity.y = -DASH_VELOCITY_BASE / 1.35;
 					}
 					else {
 						this.dash_direction = DASH_DIRECTION_RIGHT;
@@ -430,9 +549,9 @@ class Player extends GameObject {
 			}
 			// should be at least as fast as before
 			if (dash_velocity.x > 0)
-				dash_velocity.x = Math.max(dash_velocity.x, this.velocity.x);
+				dash_velocity.x = Math.max(dash_velocity.x, this.velocity.x + 1);
 			if (dash_velocity.x < 0)
-				dash_velocity.x = Math.min(dash_velocity.x, this.velocity.x);
+				dash_velocity.x = Math.min(dash_velocity.x, this.velocity.x - 1);
 			// obtain speed boost
 			if (dash_velocity.x < 0 && this.recent_touch_velocity.x < 0)
 				dash_velocity.x += this.recent_touch_velocity.x;
@@ -441,6 +560,10 @@ class Player extends GameObject {
 
 			// update velocity to the dash velocity
 			this.velocity = dash_velocity;
+
+			// generate visual effects for the dash
+			this.createDashEffects();
+
 			// if dash upwards, clear the air-jump state
 			if (this.dash_direction == DASH_DIRECTION_UP || this.dash_direction == DASH_DIRECTION_LEFT_UP || this.dash_direction == DASH_DIRECTION_RIGHT_UP)
 				this.airjump_time = 0;
@@ -676,6 +799,7 @@ class Player extends GameObject {
 		this.handleMovement();
 		if (this.should_be_killed)
 			return;
+		this.updateVisualEffects();
 		this.handleInteractiveObjects();
 		if (this.should_be_killed)
 			return;

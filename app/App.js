@@ -13,7 +13,7 @@ class App {
 		this.startRoom = new StartRoom();
 
 		this.gameRoomName = "No Room";
-		this.targetRoomName = "Tutorial_hard2";
+		this.targetRoomName = "Tutorial_hard3";
 		this.level = -1;
 	}
 	run_debug() {

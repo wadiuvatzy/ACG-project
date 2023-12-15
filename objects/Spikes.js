@@ -61,7 +61,11 @@ class Spike extends GameObject {
 
 		// change to the 3D model here (copy spike_ball)
 		this.spike3D = spike_ball.clone();
+		this.spike3D2 = spike_ball.clone();
+		this.spike3D3 = spike_ball.clone();
 		this.gameRoom.scene.add(this.spike3D);
+		this.gameRoom.scene.add(this.spike3D2);
+		this.gameRoom.scene.add(this.spike3D3);
 
 		this.gameRoom.scene.add(this.sphere);
 	}
@@ -85,6 +89,12 @@ class Spike extends GameObject {
 		this.spike3D.position.x = this.position.x;
 		this.spike3D.position.y = this.position.y;
 		this.spike3D.position.z = 0
+		this.spike3D2.position.x = this.position.x;
+		this.spike3D2.position.y = this.position.y;
+		this.spike3D2.position.z = -12
+		this.spike3D3.position.x = this.position.x;
+		this.spike3D3.position.y = this.position.y;
+		this.spike3D3.position.z = 12
 		/*
 		this.spike_ball.position.x = this.box.position.x;
 		this.spike_ball.position.y = this.box.position.y;
@@ -137,7 +147,7 @@ class DeadlyBlock extends GameObject {
 		this.reset();
 
 		const geometry = new THREE.BoxGeometry(this.width, this.height, 5 * BLOCK_UNIT_SIZE);
-		const material = new THREE.MeshStandardMaterial({ color: 0x7f0000 });
+		const material = new THREE.MeshStandardMaterial({ color: 0x7f0000, transparent: true, opacity: 0.4 });
 		this.box = new THREE.Mesh(geometry, material);
 		this.gameRoom.scene.add(this.box);
 	}

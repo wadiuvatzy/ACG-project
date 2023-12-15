@@ -108,6 +108,10 @@ class DropBlock extends Block {
 			}
 			this.drop_timer -= 1;
 		}
+		if (this.position.y < -300 * BLOCK_UNIT_SIZE) {
+			this.position.x = -300 * BLOCK_UNIT_SIZE;
+			this.position.y = -300 * BLOCK_UNIT_SIZE;
+		}
 	}
 	playerInteraction(player) {
 		var player_is_on = (player.standing_on == this);
@@ -152,7 +156,8 @@ class WeakBlock extends Block {
 	Breaks() { // called at the onStep function of DropBlock class and playerInteraction of this class
 		this.crashed = true;
 		this.gameRoom.scene.remove(this.box);
-		this.position = new THREE.Vector2(-100, -100);
+		this.position.x = -300 * BLOCK_UNIT_SIZE;
+		this.position.y = -300 * BLOCK_UNIT_SIZE;
 		this.previous_position = this.position.clone();
 	}
 	playerInteraction(player) {
