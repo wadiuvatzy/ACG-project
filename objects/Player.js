@@ -588,7 +588,7 @@ class Player extends GameObject {
 						this.velocity.y = JUMP_SPEED_Y * 0.8;
 					}
 				}
-				else if (this.dash_time_remains > 0 && this.dash_direction == DASH_DIRECTION_LEFT || this.dash_direction == DASH_DIRECTION_RIGHT) {
+				else if (this.dash_time_remains > 0 && (this.dash_direction == DASH_DIRECTION_LEFT || this.dash_direction == DASH_DIRECTION_RIGHT)) {
 					// super dash
 					if (this.direction == DIRECTION_LEFT) {
 						this.velocity.x = -SUPER_SPEED;

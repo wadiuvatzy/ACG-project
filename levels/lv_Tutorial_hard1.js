@@ -80,5 +80,6 @@ export const lv_Tutorial_hard1 = {
 	"camera_triggers": [
 		0, 16, -2, 6, 10, 10, 3, 3, 125, 0.1, 5.0, 0.0, 0.0,
 		16, 21, -2, 6, 22, 76, -20, 4, 125, 0.1, 5.0, 50.0, 12.0,
-	]
+	],
+	"bgm_name": "Tutorial",
 };

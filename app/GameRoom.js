@@ -86,6 +86,8 @@ class GameRoom {
 		this.just_dead = false;
 		this.camera_controller = new CameraController(this);
 
+		this.bgm_name = "";
+
 		// images for reset/quit
 		var texture = new THREE.TextureLoader().load("../textures/Rreset.png");
 		var geometry = new THREE.PlaneGeometry(123.5, 23);
@@ -136,6 +138,9 @@ class GameRoom {
 	init_room(room_name) {
 		this.scene = new THREE.Scene();
 		levels.make_level(this, levels.NameToLevel[room_name]);
+
+		// add bgm
+		utils.play_music(this.bgm_name);
 
 		// add lights
 		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);

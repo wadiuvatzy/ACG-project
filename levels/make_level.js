@@ -99,4 +99,6 @@ export function make_level(gameRoom, level_data) {
 			camera_triggers_data[i + 12],
 		))
 	}
+
+	gameRoom.bgm_name = level_data.bgm_name;
 }

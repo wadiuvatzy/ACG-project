@@ -19,8 +19,12 @@ class App {
 		this.all_game_rooms.push(levels.Levels["Tutorial"])
 		this.level = -1;
 		this.second_level = -1;
+
+		this.audio_listener = new THREE.AudioListener();
+
+		utils.play_music("Intro");
 	}
-	run_debug() {
+	run() {
 		utils.KeyboardUpdate();
 		if (this.second_level == -2) {
 			// get back from second level to first level
@@ -50,6 +54,8 @@ class App {
 				this.second_level = -1;
 				this.startRoom.reset();
 				this.gameRoomName = "No Room";
+				this.targetRoomName = "No Room";
+				utils.play_music("Intro");
 			}
 			if (this.gameRoomName != this.targetRoomName) {
 				this.gameRoomName = this.targetRoomName;
@@ -59,9 +65,6 @@ class App {
 			this.gameRoom.Render();
 			this.renderer.render(this.gameRoom.scene, this.gameRoom.camera);
 		}
-	}
-	run() {
-
 	}
 };
 

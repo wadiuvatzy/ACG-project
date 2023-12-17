@@ -18,7 +18,7 @@ function animate() {
 	delta = now - then;
 	if (delta >= interval) {
 		then = now - (delta % interval);
-		app.run_debug();
+		app.run();
 	}
 }
 
