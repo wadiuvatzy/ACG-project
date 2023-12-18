@@ -21,8 +21,6 @@ class App {
 		this.second_level = -1;
 
 		this.audio_listener = new THREE.AudioListener();
-
-		utils.play_music("Intro");
 	}
 	run() {
 		utils.KeyboardUpdate();
