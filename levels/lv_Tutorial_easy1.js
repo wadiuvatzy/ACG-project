@@ -9,7 +9,9 @@ BGTexture.wrapT = THREE.RepeatWrapping;
 const BGMaterial = new THREE.MeshStandardMaterial({ map: BGTexture });
 
 const BG = new THREE.Mesh(geometry, BGMaterial);
-
+BG.position.x = 0;
+BG.position.y = 0;
+BG.position.z = -50;
 
 
 export const lv_Tutorial_easy1 = {
@@ -42,4 +44,5 @@ export const lv_Tutorial_easy1 = {
 		0, 19, -4, 14, 9, 9, 4, 4, 125, 0.1, 5.0, 0.0, 0.0
 	],
 	"bgm_name": "Tutorial",
+	"background": BG,
 };

@@ -101,4 +101,5 @@ export function make_level(gameRoom, level_data) {
 	}
 
 	gameRoom.bgm_name = level_data.bgm_name;
+	gameRoom.background = level_data.background;
 }

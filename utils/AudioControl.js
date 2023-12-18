@@ -14,13 +14,16 @@ const bgm_easy = new THREE.Audio(listener);
 const bgm_medium = new THREE.Audio(listener);
 const bgm_hard = new THREE.Audio(listener);
 
-var intro_loaded = false;
+export var intro_loaded = false;
 
-audioLoader.load('audio/intro.mp3', function (buffer) {
-	bgm_intro.setBuffer(buffer);
-	sound.setLoop(true);
-	sound.setVolume(0.5);
-	intro_loaded = true;
+const introPromise = new Promise((resolve) => {
+	audioLoader.load('audio/intro.mp3', function (buffer) {
+		bgm_intro.setBuffer(buffer);
+		bgm_intro.setLoop(true);
+		bgm_intro.setVolume(0.5);
+		intro_loaded = true;
+		resolve();
+	});
 });
 audioLoader.load('audio/tutorial.mp3', function (buffer) {
 	bgm_tutorial.setBuffer(buffer);

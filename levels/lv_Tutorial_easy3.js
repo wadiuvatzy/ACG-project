@@ -1,3 +1,17 @@
+import * as THREE from 'three';
+
+const geometry = new THREE.PlaneGeometry(4800, 4800);
+const textureLoader = new THREE.TextureLoader();
+const BGTexture = textureLoader.load('textures/background_tutorial.png');
+BGTexture.repeat.set(100, 100);
+BGTexture.wrapS = THREE.RepeatWrapping;
+BGTexture.wrapT = THREE.RepeatWrapping;
+const BGMaterial = new THREE.MeshStandardMaterial({ map: BGTexture });
+
+const BG = new THREE.Mesh(geometry, BGMaterial);
+BG.position.x = 0;
+BG.position.y = 0;
+BG.position.z = -50;
 
 export const lv_Tutorial_easy3 = {
 	"player": {
@@ -56,4 +70,5 @@ export const lv_Tutorial_easy3 = {
 		0, 28, 18, 36, 6, 20, 24, 24, 150, 0.15, 8.0, 0.0, 6.0
 	],
 	"bgm_name": "Tutorial",
+	"background": BG,
 };

@@ -85,6 +85,7 @@ class GameRoom {
 		this.dead_waiting_reset = false;
 		this.just_dead = false;
 		this.camera_controller = new CameraController(this);
+		this.background = null;
 
 		this.bgm_name = "";
 
@@ -141,6 +142,10 @@ class GameRoom {
 
 		// add bgm
 		utils.play_music(this.bgm_name);
+
+		// add background
+		if (this.background != null)
+			this.scene.add(this.background);
 
 		// add lights
 		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);

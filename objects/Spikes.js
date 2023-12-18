@@ -67,7 +67,7 @@ class Spike extends GameObject {
 		this.gameRoom.scene.add(this.spike3D2);
 		this.gameRoom.scene.add(this.spike3D3);
 
-		this.gameRoom.scene.add(this.sphere);
+		// this.gameRoom.scene.add(this.sphere);
 	}
 	reset() {
 		this.position = this.initial_position.clone();
