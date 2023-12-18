@@ -25,6 +25,8 @@ class StartRoom {
 		this.keyValue = null; // 1 for left, 2 for right
 		this.press_timer = 0;
 		this.jump_continue_from_first_to_second = false;
+		this.started = false;
+		this.zero_last_jump = false;
 	}
 
 	create_scene() {
@@ -55,11 +57,11 @@ class StartRoom {
 		texture = loader.load('../textures/select_levels.png');
 		var geometry = new THREE.PlaneGeometry(122, 14, 32);
 		var material = new THREE.MeshBasicMaterial({ map: texture, alphaTest: 0, transparent: true });
-		var plane = new THREE.Mesh(geometry, material);
-		plane.position.x = 0;
-		plane.position.y = -55;
-		plane.position.z = 0;
-		this.scene.add(plane);
+		this.select_level_plane = new THREE.Mesh(geometry, material);
+		this.select_level_plane.position.x = 0;
+		this.select_level_plane.position.y = -55;
+		this.select_level_plane.position.z = 500;
+		this.scene.add(this.select_level_plane);
 
 		texture = loader.load('../textures/strawberry.png');
 		var geometry = new THREE.PlaneGeometry(10, 10, 32);
@@ -107,13 +109,13 @@ class StartRoom {
 			var cube = new THREE.Mesh(geometry, material);
 			cube.position.x = 0 + 2 * this.level_radius * Math.sin(this.level_angles[i])
 			cube.position.y = -20;
-			cube.position.z = 0 + this.level_radius * Math.cos(this.level_angles[i])
+			cube.position.z = 500 + this.level_radius * Math.cos(this.level_angles[i])
 			this.scene.add(cube);
 			this.level_blocks.push(cube);
 			var word_cube = new THREE.Mesh(word_geometry, word_material);
 			word_cube.position.x = 0 + 2 * this.level_radius * Math.sin(this.level_angles[i])
 			word_cube.position.y = -31;
-			word_cube.position.z = 0 + this.level_radius * Math.cos(this.level_angles[i])
+			word_cube.position.z = 500 + this.level_radius * Math.cos(this.level_angles[i])
 			this.scene.add(word_cube);
 			this.level_word_blocks.push(word_cube);
 		}
@@ -137,6 +139,17 @@ class StartRoom {
 		this.background_plane.position.y = 0;
 		this.background_plane.position.z = -40;
 		this.scene.add(this.background_plane);
+
+		// load the start sentence
+		texture = loader.load('../textures/start_sentence.png');
+		var geometry = new THREE.PlaneGeometry(138, 24, 32);
+		var material = new THREE.MeshBasicMaterial({ map: texture, alphaTest: 0, transparent: true, emissiveMap: word_texture, emissiveIntensity: 1.0, emissive: 0xffffff });
+		this.start_plane = new THREE.Mesh(geometry, material);
+		this.start_plane.position.x = 0;
+		this.start_plane.position.y = -10;
+		this.start_plane.position.z = 0;
+		this.scene.add(this.start_plane);
+
 	}
 	reset() {
 		for (var i = 0; i < 4; i++) {
@@ -247,8 +260,9 @@ class StartRoom {
 			this.level_word_blocks[i].position.y = -31;
 			this.level_word_blocks[i].position.z = 0 + this.level_radius * Math.cos(this.level_angles[i])
 		}
+
 	}
-	Step() {
+	move_background() {
 		this.time += 1;
 		this.strawberry_plane.position.z = 3 + Math.sin(this.time / 50) * 1.5;
 		this.background_plane.position.x = Math.sin(this.time / 149) * 5;
@@ -259,6 +273,26 @@ class StartRoom {
 			var material = new THREE.MeshBasicMaterial({ map: this.background_textures[this.background_index] })
 			this.background_plane.material = material;
 		}
+	}
+	ZeroStep() {
+		this.move_background();
+		var keyboardValue = utils.getKeyboardValue();
+		if (this.zero_last_jump == true && !keyboardValue.Jump) {
+			this.started = true;
+			utils.play_music("Intro");
+			this.start_plane.position.z = 500;
+			this.select_level_plane.position.z = 0;
+		}
+		this.zero_last_jump = keyboardValue.Jump;
+
+	}
+	Step() {
+		if (!this.started) {
+			this.ZeroStep();
+			return -1;
+		}
+
+		this.move_background();
 
 		// move level blocks
 		var keyboardValue = utils.getKeyboardValue();

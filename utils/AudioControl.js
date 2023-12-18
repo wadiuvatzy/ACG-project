@@ -20,13 +20,16 @@ const bgm_easy = new THREE.Audio(listener);
 const bgm_medium = new THREE.Audio(listener);
 const bgm_hard = new THREE.Audio(listener);
 
-var intro_loaded = false;
+export var intro_loaded = false;
 
-audioLoader.load('audio/intro.mp3', function (buffer) {
-	bgm_intro.setBuffer(buffer);
-	sound.setLoop(true);
-	sound.setVolume(0.5);
-	intro_loaded = true;
+const introPromise = new Promise((resolve) => {
+	audioLoader.load('audio/intro.mp3', function (buffer) {
+		bgm_intro.setBuffer(buffer);
+		bgm_intro.setLoop(true);
+		bgm_intro.setVolume(0.5);
+		intro_loaded = true;
+		resolve();
+	});
 });
 audioLoader.load('audio/tutorial.mp3', function (buffer) {
 	bgm_tutorial.setBuffer(buffer);
@@ -59,11 +62,17 @@ const BGM = {
 
 
 var current_bgm = "None";
-export function play_music(music_id) {
+export async function play_music(music_id) {
+	if (!intro_loaded) {
+		// Wait for the intro to be loaded
+		await introPromise;
+	}
 	if (current_bgm != music_id) {
+		// window.alert("play music: " + music_id);
 		if (current_bgm != "None")
 			BGM[current_bgm].stop();
 		current_bgm = music_id;
+		BGM[current_bgm].autoplay = true;
 		BGM[current_bgm].play();
 	}
 }
