@@ -7,6 +7,10 @@ export const BLOCK_WEAK = 1;
 export const BLOCK_DROP = 2;
 export const BLOCK_MOVABLE = 3;
 
+const textureLoader = new THREE.TextureLoader();
+const BlockTexture = textureLoader.load('textures/block_blue.png');
+const BlockTextureSide = textureLoader.load('textures/block_blue.png');
+
 class Block extends GameObject {
 	constructor(gameRoom, initial_position, width, height) {
 		super(gameRoom);
@@ -19,7 +23,28 @@ class Block extends GameObject {
 
 		// Initialize the 3D object and its tiles.
 		const geometry = new THREE.BoxGeometry(this.width, this.height, 5 * BLOCK_UNIT_SIZE);
-		const material = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
+		const texture_front = BlockTexture.clone();
+		const texture_top = BlockTexture.clone();
+		const texture_side = BlockTextureSide.clone();
+		texture_front.repeat.set(width / BLOCK_UNIT_SIZE, height / BLOCK_UNIT_SIZE);
+		texture_front.wrapS = THREE.RepeatWrapping;
+		texture_front.wrapT = THREE.RepeatWrapping;
+		texture_front.needsUpdate = true;
+		texture_top.repeat.set(width / BLOCK_UNIT_SIZE, 5);
+		texture_top.rotation = Math.PI;
+		texture_top.wrapS = THREE.RepeatWrapping;
+		texture_top.wrapT = THREE.RepeatWrapping;
+		texture_side.repeat.set(5, height / BLOCK_UNIT_SIZE);
+		texture_side.wrapS = THREE.RepeatWrapping;
+		texture_side.wrapT = THREE.RepeatWrapping;
+		const material = [
+			new THREE.MeshStandardMaterial({ map: texture_side }),
+			new THREE.MeshStandardMaterial({ map: texture_side }),
+			new THREE.MeshStandardMaterial({ map: texture_top }),
+			new THREE.MeshStandardMaterial({ map: texture_top }),
+			new THREE.MeshStandardMaterial({ map: texture_front }),
+			new THREE.MeshStandardMaterial({ map: texture_front }),
+		];
 		this.box = new THREE.Mesh(geometry, material);
 		this.gameRoom.scene.add(this.box);
 	}

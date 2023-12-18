@@ -120,7 +120,7 @@ class GameRoom {
 		levels.make_level(this, levels.NameToLevel["Tutorial_easy1"]);
 
 		// add lights
-		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+		this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
 		this.directionalLight.position.x = 10;
 		this.directionalLight.position.y = 100;
 		this.directionalLight.position.z = 20;
@@ -172,15 +172,21 @@ class GameRoom {
 
 		this.paused = false;
 		this.wins = false;
+		this.wins_waiting = false;
+		this.just_wins = false;
+
 		this.dead_waiting_reset = false;
 		this.just_dead = false;
 
+		/*
 		this.scene.remove(this.directionalLight)
 		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 		this.directionalLight.position.x = 10;
 		this.directionalLight.position.y = 100;
 		this.directionalLight.position.z = 20;
 		this.scene.add(this.directionalLight);
+		*/
+		this.directionalLight.intensity = 1.0;
 		this.scene.remove(this.reset_text);
 		this.scene.remove(this.quit_text);
 	}
@@ -192,6 +198,13 @@ class GameRoom {
 		}
 		if (this.wins) {
 			this.paused = true;
+			if (this.wins_waiting) {
+				this.just_wins = false;
+			}
+			else {
+				this.wins_waiting = true;
+				this.just_wins = true;
+			}
 			// TODO
 			return;
 		}
@@ -234,24 +247,56 @@ class GameRoom {
 			obj.onRender();
 		}
 		this.player.onRender();
+
+		if (this.just_wins) {
+			// add a winning text
+
+			this.reset_text.position.x = this.camera.position.x;
+			this.reset_text.position.y = this.camera.position.y - 80;
+			this.reset_text.position.z = this.camera.position.z - 60;
+			this.scene.add(this.reset_text);
+
+			this.quit_text.position.x = this.camera.position.x;
+			this.quit_text.position.y = this.camera.position.y - 100;
+			this.quit_text.position.z = this.camera.position.z - 60;
+			this.scene.add(this.quit_text);
+		}
+		if (this.wins) {
+			var velocity = 3;
+			if (this.reset_text.position.y >= this.camera.position.y - 20)
+				velocity = (this.camera.position.y - this.reset_text.position.y) / 20.0 * 3.0;
+			this.reset_text.position.y = Math.min(this.reset_text.position.y + velocity, this.camera.position.y + 20);
+			this.quit_text.position.y = Math.min(this.quit_text.position.y + velocity, this.camera.position.y - 20);
+		}
+
 		if (this.just_dead) {
-			this.scene.remove(this.directionalLight)
+			// this.scene.remove(this.directionalLight)
 			// window.alert("scene: ", this.scene)
+			/*
 			this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
 			this.directionalLight.position.x = 10;
 			this.directionalLight.position.y = 100;
 			this.directionalLight.position.z = 20;
 			this.scene.add(this.directionalLight);
+			*/
 
 			this.reset_text.position.x = this.camera.position.x;
-			this.reset_text.position.y = this.camera.position.y + 20;
-			this.reset_text.position.z = this.camera.position.z / 2;
+			this.reset_text.position.y = this.camera.position.y - 80;
+			this.reset_text.position.z = this.camera.position.z - 60;
 			this.scene.add(this.reset_text);
 
 			this.quit_text.position.x = this.camera.position.x;
-			this.quit_text.position.y = this.camera.position.y - 20;
-			this.quit_text.position.z = this.camera.position.z / 2;
+			this.quit_text.position.y = this.camera.position.y - 120;
+			this.quit_text.position.z = this.camera.position.z - 60;
 			this.scene.add(this.quit_text);
+		}
+		if (this.player.should_be_killed) {
+			this.directionalLight.intensity = Math.max(this.directionalLight.intensity - 0.05, 0.1);
+			var velocity = 3;
+			if (this.reset_text.position.y >= this.camera.position.y)
+				velocity = (20.0 + this.camera.position.y - this.reset_text.position.y) / 20.0 * 3.0;
+			this.reset_text.position.y = Math.min(this.reset_text.position.y + velocity, this.camera.position.y + 20);
+			this.quit_text.position.y = Math.min(this.quit_text.position.y + velocity, this.camera.position.y - 20);
 		}
 	}
 }
