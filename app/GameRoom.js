@@ -92,13 +92,31 @@ class GameRoom {
 		// images for reset/quit
 		var texture = new THREE.TextureLoader().load("../textures/Rreset.png");
 		var geometry = new THREE.PlaneGeometry(123.5, 23);
-		var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.5 });
+		var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0 });
 		this.reset_text = new THREE.Mesh(geometry, material);
-		
+
 		var texture = new THREE.TextureLoader().load("../textures/ESCquit.png");
 		var geometry = new THREE.PlaneGeometry(123.5, 23);
-		var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.5 });
+		var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0 });
 		this.quit_text = new THREE.Mesh(geometry, material);
+
+		// images for wins
+		this.wins_background_lights = []
+		for (var i = 0; i < 9; i++) {
+			texture = new THREE.TextureLoader().load("../textures/win_background_lights/" + i.toString() + ".png");
+			// texture = new THREE.TextureLoader().load("../textures/ESCquit.png");
+			this.wins_background_lights.push(texture);
+		}
+		var geometry = new THREE.PlaneGeometry(320, 180);
+		var material = new THREE.MeshBasicMaterial({ map: this.wins_background_lights[0], transparent: true, alphaTest: 0, opacity: 0.1 });
+		this.wins_background = new THREE.Mesh(geometry, material);
+		this.timer = 0;
+		this.current_image_index = 0;
+		texture = new THREE.TextureLoader().load("../textures/win_strawberry.png");
+		var geometry = new THREE.PlaneGeometry(30, 30);
+		var material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0, opacity: 1.0 });
+		texture.encoding = THREE.sRGBEncoding;
+		this.win_strawberry = new THREE.Mesh(geometry, material);
 	}
 	init_debug() {
 		/*
@@ -158,6 +176,8 @@ class GameRoom {
 		this.scene.add(ambientlight);
 		this.scene.remove(this.reset_text);
 		this.scene.remove(this.quit_text);
+		this.scene.remove(this.wins_background);
+		this.scene.remove(this.win_strawberry);
 
 		this.reset();
 	}
@@ -194,9 +214,16 @@ class GameRoom {
 		this.directionalLight.intensity = 1.0;
 		this.scene.remove(this.reset_text);
 		this.scene.remove(this.quit_text);
+		this.scene.remove(this.wins_background);
+		this.scene.remove(this.win_strawberry);
 	}
 	// Given the time elapsed and keyboard inputs, compute the next state.
 	Step() {
+		this.timer += 1;
+		if (this.timer % 15 == 0) {
+			this.current_image_index = (this.current_image_index + 1) % 9;
+			this.wins_background.material = new THREE.MeshBasicMaterial({ map: this.wins_background_lights[this.current_image_index], transparent: true, alphaTest: 0, opacity: 0.1 });
+		}
 		var keyboardValue = utils.getKeyboardValue();
 		if (keyboardValue.ResetPressed) {
 			this.reset();
@@ -255,23 +282,31 @@ class GameRoom {
 
 		if (this.just_wins) {
 			// add a winning text
+			this.wins_background.position.x = this.camera.position.x;
+			this.wins_background.position.y = this.camera.position.y + 20;
+			this.wins_background.position.z = this.camera.position.z - 80;
+			this.scene.add(this.wins_background);
+			this.win_strawberry.position.x = this.camera.position.x;
+			this.win_strawberry.position.y = this.camera.position.y + 17;
+			this.win_strawberry.position.z = this.camera.position.z - 60;
+			this.scene.add(this.win_strawberry);
 
 			this.reset_text.position.x = this.camera.position.x;
-			this.reset_text.position.y = this.camera.position.y - 80;
+			this.reset_text.position.y = this.camera.position.y - 90;
 			this.reset_text.position.z = this.camera.position.z - 60;
 			this.scene.add(this.reset_text);
 
 			this.quit_text.position.x = this.camera.position.x;
-			this.quit_text.position.y = this.camera.position.y - 100;
+			this.quit_text.position.y = this.camera.position.y - 110;
 			this.quit_text.position.z = this.camera.position.z - 60;
 			this.scene.add(this.quit_text);
 		}
 		if (this.wins) {
 			var velocity = 3;
-			if (this.reset_text.position.y >= this.camera.position.y - 20)
-				velocity = (this.camera.position.y - this.reset_text.position.y) / 20.0 * 3.0;
-			this.reset_text.position.y = Math.min(this.reset_text.position.y + velocity, this.camera.position.y + 20);
-			this.quit_text.position.y = Math.min(this.quit_text.position.y + velocity, this.camera.position.y - 20);
+			if (this.reset_text.position.y >= this.camera.position.y - 30)
+				velocity = (this.camera.position.y - this.reset_text.position.y) / 30.0 * 3.0;
+			this.reset_text.position.y = Math.min(this.reset_text.position.y + velocity, this.camera.position.y - 10);
+			this.quit_text.position.y = Math.min(this.quit_text.position.y + velocity, this.camera.position.y - 30);
 		}
 
 		if (this.just_dead) {
