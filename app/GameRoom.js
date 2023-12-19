@@ -139,11 +139,16 @@ class GameRoom {
 		levels.make_level(this, levels.NameToLevel["Tutorial_easy1"]);
 
 		// add lights
-		this.directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+		this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
 		this.directionalLight.position.x = 10;
 		this.directionalLight.position.y = 100;
 		this.directionalLight.position.z = 20;
 		this.scene.add(this.directionalLight);
+		this.directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+		this.directionalLight2.position.x = -10;
+		this.directionalLight2.position.y = -10;
+		this.directionalLight2.position.z = 40;
+		this.scene.add(this.directionalLight2);
 
 		const ambientlight = new THREE.AmbientLight(0x404040); // soft white light
 		this.scene.add(ambientlight);
@@ -171,6 +176,11 @@ class GameRoom {
 		this.directionalLight.position.y = 100;
 		this.directionalLight.position.z = 20;
 		this.scene.add(this.directionalLight);
+		this.directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+		this.directionalLight2.position.x = -10;
+		this.directionalLight2.position.y = -10;
+		this.directionalLight2.position.z = 40;
+		this.scene.add(this.directionalLight2);
 
 		const ambientlight = new THREE.AmbientLight(0x404040); // soft white light
 		this.scene.add(ambientlight);
@@ -211,7 +221,8 @@ class GameRoom {
 		this.directionalLight.position.z = 20;
 		this.scene.add(this.directionalLight);
 		*/
-		this.directionalLight.intensity = 1.0;
+		this.directionalLight.intensity = 0.8;
+		this.directionalLight2.intensity = 0.8;
 		this.scene.remove(this.reset_text);
 		this.scene.remove(this.quit_text);
 		this.scene.remove(this.wins_background);
@@ -332,6 +343,7 @@ class GameRoom {
 		}
 		if (this.player.should_be_killed) {
 			this.directionalLight.intensity = Math.max(this.directionalLight.intensity - 0.05, 0.1);
+			this.directionalLight2.intensity = Math.max(this.directionalLight2.intensity - 0.05, 0.1);
 			var velocity = 3;
 			if (this.reset_text.position.y >= this.camera.position.y)
 				velocity = (20.0 + this.camera.position.y - this.reset_text.position.y) / 20.0 * 3.0;

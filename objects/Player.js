@@ -48,6 +48,9 @@ function dumpObject(obj, lines = [], isLast = true, prefix = '') {
 	return lines;
 }
 
+
+const effect_color = 0xafafff;
+const effect_color_second = 0xff0f0f;
 class DashEffect {
 	constructor(gameRoom) {
 		this.gameRoom = gameRoom;
@@ -63,8 +66,10 @@ class DashEffect {
 		this.box.position.y = -800;
 		this.need_to_define_velocity = false;
 		this.initial_position = new THREE.Vector2(0, 0);
+		this.dash_count = 0;
 	}
-	generate(position, velocity) {
+	generate(position, dash_count = 0) {
+		this.dash_count = dash_count;
 		this.initial_position = position.clone();
 		this.need_to_define_velocity = true;
 
@@ -85,7 +90,10 @@ class DashEffect {
 		this.box.scale.x = obj_scale;
 		this.box.scale.y = obj_scale;
 		this.box.scale.z = obj_scale;
-		this.box.material = new THREE.MeshStandardMaterial({ color: 0xafafff, transparent: true, opacity: this.time_remains / 35, emissiveIntensity: 0.8, emissive: 0xafafff });
+		if (this.dash_count == 0)
+			this.box.material = new THREE.MeshStandardMaterial({ color: effect_color, transparent: true, opacity: this.time_remains / 35, emissiveIntensity: 0.8, emissive: effect_color });
+		else
+			this.box.material = new THREE.MeshStandardMaterial({ color: effect_color_second, transparent: true, opacity: this.time_remains / 35, emissiveIntensity: 0.8, emissive: effect_color_second });
 	}
 	reset() {
 		this.box.position.x = -800;
@@ -129,7 +137,12 @@ class DashEffect {
 			this.box.scale.x *= 0.97;
 			this.box.scale.y *= 0.97;
 			this.box.scale.z *= 0.97;
-			this.box.material = new THREE.MeshStandardMaterial({ color: 0xafafff, transparent: true, opacity: this.time_remains / 35, emissiveIntensity: 0.8, emissive: 0xafafff })
+
+			if (this.dash_count == 0)
+				this.box.material = new THREE.MeshStandardMaterial({ color: effect_color, transparent: true, opacity: this.time_remains / 35, emissiveIntensity: 0.8, emissive: effect_color });
+			else
+				this.box.material = new THREE.MeshStandardMaterial({ color: effect_color_second, transparent: true, opacity: this.time_remains / 35, emissiveIntensity: 0.8, emissive: effect_color_second });
+
 			this.velocity.x *= 0.9;
 			this.velocity.y *= 0.9;
 			this.velocity.z *= 0.9;
@@ -171,7 +184,7 @@ class Player extends GameObject {
 			madeline_mesh.geometry.center();
 		})
 
-		this.max_dash_effects = 20;
+		this.max_dash_effects = 30;
 		this.dash_effects = [];
 		for (let i = 0; i < this.max_dash_effects; i++) {
 			this.dash_effects.push(new DashEffect(this.gameRoom));
@@ -233,10 +246,10 @@ class Player extends GameObject {
 			this.dash_effects[i].step(this.position);
 	}
 
-	createDashEffects() {
-		let count = Math.round(Math.random() * 4 + 5);
+	createDashEffects(dash_count = 0) {
+		let count = Math.round(Math.random() * 6 + 7);
 		for (let i = 0; i < count; i++) {
-			this.dash_effects[this.dash_effect_iter].generate(this.position);
+			this.dash_effects[this.dash_effect_iter].generate(this.position, dash_count);
 
 			this.dash_effect_iter += 1;
 			if (this.dash_effect_iter >= this.max_dash_effects)
@@ -562,7 +575,7 @@ class Player extends GameObject {
 			this.velocity = dash_velocity;
 
 			// generate visual effects for the dash
-			this.createDashEffects();
+			this.createDashEffects(this.dash_count);
 
 			// if dash upwards, clear the air-jump state
 			if (this.dash_direction == DASH_DIRECTION_UP || this.dash_direction == DASH_DIRECTION_LEFT_UP || this.dash_direction == DASH_DIRECTION_RIGHT_UP)
