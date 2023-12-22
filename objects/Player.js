@@ -577,6 +577,9 @@ class Player extends GameObject {
 			// generate visual effects for the dash
 			this.createDashEffects(this.dash_count);
 
+			// play sound effects
+			utils.play_effect('dash');
+
 			// if dash upwards, clear the air-jump state
 			if (this.dash_direction == DASH_DIRECTION_UP || this.dash_direction == DASH_DIRECTION_LEFT_UP || this.dash_direction == DASH_DIRECTION_RIGHT_UP)
 				this.airjump_time = 0;
@@ -705,6 +708,9 @@ class Player extends GameObject {
 			this.dash_time_remains = 0;
 			this.dash_time_remains_for_wb = 0;
 			this.dash_refresh_cd = Math.min(this.dash_refresh_cd, 2);
+
+			// play sound effect
+			utils.play_effect('jump');
 		}
 	}
 
