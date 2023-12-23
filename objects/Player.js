@@ -246,6 +246,12 @@ class Player extends GameObject {
 			this.dash_effects[i].step(this.position);
 	}
 
+	cancelDash() {
+		this.dash_time_remains = 0;
+		this.dash_time_remains_for_wb = 0;
+		this.dash_direction = DASH_DIRECTION_NONE;
+	}
+
 	createDashEffects(dash_count = 0) {
 		let count = Math.round(Math.random() * 6 + 7);
 		for (let i = 0; i < count; i++) {

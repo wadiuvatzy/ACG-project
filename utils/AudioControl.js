@@ -75,24 +75,24 @@ export async function play_music(music_id) {
 // init all sound effects.
 
 const Effects = {
-	'jump': [],
-	'dash': [],
-	'pumber': []
+	"jump": [],
+	"dash": [],
+	"pumber": []
 	// TODO
-}
+};
 const EffectsIter = {
-	'jump': 0,
-	'dash': 0,
-	'pumber': 0,
-}
+	"jump": 0,
+	"dash": 0,
+	"pumber": 0
+};
 
 const MAX_EFFECTS = 5;
 
 audioLoader.load('audio/effects/jump.mp3', function (buffer) {
-	for (let i = 0; i < MAX_EFFECTS; i++) {
+	for (var i = 0; i < MAX_EFFECTS; i++) {
 		const audio = new THREE.Audio(listener);
 		audio.setBuffer(buffer);
-		audio.setLoop(False);
+		audio.setLoop(false);
 		audio.setVolume(0.5);
 		Effects.jump.push(audio);
 	}
@@ -101,7 +101,7 @@ audioLoader.load('audio/effects/dash.mp3', function (buffer) {
 	for (let i = 0; i < MAX_EFFECTS; i++) {
 		const audio = new THREE.Audio(listener);
 		audio.setBuffer(buffer);
-		audio.setLoop(False);
+		audio.setLoop(false);
 		audio.setVolume(0.5);
 		Effects.dash.push(audio);
 	}
@@ -110,7 +110,7 @@ audioLoader.load('audio/effects/pumber.mp3', function (buffer) {
 	for (let i = 0; i < MAX_EFFECTS; i++) {
 		const audio = new THREE.Audio(listener);
 		audio.setBuffer(buffer);
-		audio.setLoop(False);
+		audio.setLoop(false);
 		audio.setVolume(0.5);
 		Effects.pumber.push(audio);
 	}

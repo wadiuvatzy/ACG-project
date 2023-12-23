@@ -18,7 +18,7 @@ class StartRoom {
 		this.level_blocks = [];
 		this.level_word_blocks = [];
 		this.second_blocks = [];
-		this.levels_each = [6, 2, 3, 4];
+		this.levels_each = [6, 1, 1, 1];
 		this.create_scene();
 		this.init_second_blocks();
 		// this.reset_second_blocks();

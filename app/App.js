@@ -15,8 +15,11 @@ class App {
 
 		this.gameRoomName = "No Room";
 		this.targetRoomName = "Tutorial_hard3";
-		this.all_game_rooms = []
-		this.all_game_rooms.push(levels.Levels["Tutorial"])
+		this.all_game_rooms = [];
+		this.all_game_rooms.push(levels.Levels["Tutorial"]);
+		this.all_game_rooms.push(levels.Levels["Easy"]);
+		this.all_game_rooms.push(levels.Levels["Medium"]);
+		this.all_game_rooms.push(levels.Levels["Hard"]);
 		this.level = -1;
 		this.second_level = -1;
 

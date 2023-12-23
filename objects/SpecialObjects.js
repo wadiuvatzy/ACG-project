@@ -159,11 +159,9 @@ class BouncyBall extends GameObject {
 
 		if (touched) {
 			// set player status
+			player.cancelDash();
 			player.dash_cd = 6;
 			player.dash_refresh_cd = 0;
-			player.dash_time_remains = 0;
-			player.dash_time_remains_for_wb = 0;
-			player.dash_direction = DASH_DIRECTION_NONE;
 			player.dash_count = Math.max(player.dash_count, player.max_dash_count);
 
 			// set player speed
@@ -186,6 +184,9 @@ class BouncyBall extends GameObject {
 			// set ball status
 			this.iter = 6;
 			this.touch_direction = new THREE.Vector2(vx, vy);
+
+			// play sound effects
+			utils.play_effect('pumber');
 		}
 	}
 }
@@ -223,7 +224,6 @@ class DashRefresher extends GameObject {
 			this.gameRoom.scene.add(this.box);
 		}
 		this.ready = 0;
-		
 	}
 	onStep() {
 		this.timer += 1;
@@ -261,6 +261,82 @@ class DashRefresher extends GameObject {
 }
 
 
+class AccelerationRing extends GameObject {
+	constructor(gameRoom, position, direction) {
+		// type: 0-vertical, 1-horizontal
+		super(gameRoom);
+		this.position = position.clone();
+		this.type = direction;
+		this.radius = 2 * BLOCK_UNIT_SIZE;
+		this.tube = 3;
+
+		// initialize shape
+		const geometry = new THREE.TorusGeometry(2 * BLOCK_UNIT_SIZE - 2, 2);
+		const effect_color = 0xffffff
+		const material = new THREE.MeshStandardMaterial({ color: effect_color, transparent: true, opacity: 0.5, emissiveIntensity: 0.5, emissive: effect_color });
+		this.ring = new THREE.Mesh(geometry, material);
+		if (this.type == 1)
+			this.ring.rotation.y += Math.PI / 2;
+		this.gameRoom.scene.add(this.ring);
+	}
+
+	playerInteraction(player) {
+		// collision
+		let top = player.getUpper();
+		let bot = player.getLower();
+		let left = player.getLeft();
+		let right = player.getRight();
+
+		var touched = false;
+
+		if (this.type == 0) {
+			if (Math.max(left, this.position.x - this.radius) <= Math.min(right, this.position.x + this.radius)) {
+				if (Math.max(bot, this.position.y - this.tube) <= Math.min(top, this.position.y + this.tube)) {
+					touched = true;
+					if (player.velocity.y >= 0) {
+						player.velocity.y += 4.0;
+						player.position.y = Math.max(this.position.y, player.position.y);
+					}
+					else {
+						player.velocity.y = -4.0;
+						player.position.y = Math.min(this.position.y - 12, player.position.y);
+					}
+				}
+			}
+		}
+		else {
+			if (Math.max(left, this.position.x - this.tube) <= Math.min(right, this.position.x + this.tube)) {
+				if (Math.max(bot, this.position.y - this.radius) <= Math.min(top, this.position.y + this.radius)) {
+					touched = true;
+					if (player.velocity.x > 0) {
+						player.velocity.y += 1.2;
+						player.velocity.x += 3.5;
+						player.position.x = Math.max(this.position.x + 2.8, player.position.x);
+					}
+					if (player.velocity.x < 0) {
+						player.velocity.y += 1.2;
+						player.velocity.x -= 3.5;
+						player.position.x = Math.min(this.position.x - 2.8, player.position.y);
+					}
+				}
+			}
+		}
+
+		if (touched) {
+			player.cancelDash();
+			player.dash_count = Math.max(player.dash_count, player.max_dash_count);
+			// TODO: play sound effect.
+		}
+	}
+
+	onRender() {
+		this.ring.position.x = this.position.x;
+		this.ring.position.y = this.position.y;
+		this.ring.position.z = 0;
+	}
+}
+
+
 export function get_special_object(gameRoom, obj) {
 	if (obj.type == "GameGoal") {
 		return new GameGoal(gameRoom, new THREE.Vector2(obj.x * BLOCK_UNIT_SIZE, obj.y * BLOCK_UNIT_SIZE));
@@ -270,6 +346,9 @@ export function get_special_object(gameRoom, obj) {
 	}
 	else if (obj.type == "DashRefresher") {
 		return new DashRefresher(gameRoom, new THREE.Vector2(obj.x * BLOCK_UNIT_SIZE, obj.y * BLOCK_UNIT_SIZE), obj.refresh_count);
+	}
+	else if (obj.type == "AccelerationRing") {
+		return new AccelerationRing(gameRoom, new THREE.Vector2(obj.x * BLOCK_UNIT_SIZE, obj.y * BLOCK_UNIT_SIZE), obj.direction);
 	}
 	else {
 		window.alert("Error: Invalid object type!");
