@@ -277,6 +277,8 @@ class AccelerationRing extends GameObject {
 		this.ring = new THREE.Mesh(geometry, material);
 		if (this.type == 1)
 			this.ring.rotation.y += Math.PI / 2;
+		if (this.type == 0)
+			this.ring.rotation.x += Math.PI / 2;
 		this.gameRoom.scene.add(this.ring);
 	}
 
