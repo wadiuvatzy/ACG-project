@@ -302,11 +302,13 @@ class StartRoom {
 				this.target_level_angle += Math.PI / 2;
 				this.keyValue = 1;
 				this.press_timer = 0;
+				utils.play_effect('jump');
 			}
 			else if (this.press_timer == 11 && this.keyValue == 1) {
 				this.current_level = (this.current_level + 3) % 4;
 				this.target_level_angle += Math.PI / 2;
 				this.press_timer = 0;
+				utils.play_effect('jump');
 			}
 			this.press_timer += 1;
 
@@ -317,11 +319,13 @@ class StartRoom {
 				this.target_level_angle -= Math.PI / 2;
 				this.keyValue = 2;
 				this.press_timer = 0;
+				utils.play_effect('jump');
 			}
 			else if (this.press_timer == 11 && this.keyValue == 2) {
 				this.current_level = (this.current_level + 1) % 4;
 				this.target_level_angle -= Math.PI / 2;
 				this.press_timer = 0;
+				utils.play_effect('jump');
 			}
 			this.press_timer += 1;
 		}
@@ -329,6 +333,7 @@ class StartRoom {
 			// TODO: load the level
 			// window.alert("Level " + this.current_level);
 			this.jump_continue_from_first_to_second = true;
+			utils.play_effect('jump');
 			return this.current_level;
 		}
 		else {
@@ -379,6 +384,7 @@ class StartRoom {
 		var num_blocks = this.levels_each[this.current_level];
 		var keyboardValue = utils.getKeyboardValue();
 		if (keyboardValue.PausePressed) {
+			utils.play_effect('jump');
 			this.reset();
 			return -2;
 		} if (keyboardValue.Left) {
@@ -386,10 +392,12 @@ class StartRoom {
 				this.current_second_level = (this.current_second_level + num_blocks - 1) % num_blocks;
 				this.keyValue = 1;
 				this.press_timer = 0;
+				utils.play_effect('jump');
 			}
 			else if (this.press_timer == 11 && this.keyValue == 1) {
 				this.current_second_level = (this.current_second_level + num_blocks - 1) % num_blocks;
 				this.press_timer = 0;
+				utils.play_effect('jump');
 			}
 			this.press_timer += 1;
 		}
@@ -398,11 +406,13 @@ class StartRoom {
 				this.current_second_level = (this.current_second_level + 1) % num_blocks;
 				this.keyValue = 2;
 				this.press_timer = 0;
+				utils.play_effect('jump');
 			}
 			else if (this.press_timer == 11 && this.keyValue == 2) {
 				this.current_second_level = (this.current_second_level + 1) % num_blocks;
 				this.target_level_angle -= Math.PI / 2;
 				this.press_timer = 0;
+				utils.play_effect('jump');
 			}
 			this.press_timer += 1;
 		}

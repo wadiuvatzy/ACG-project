@@ -42,23 +42,22 @@ export const lv_Tutorial_easy3 = {
 
 		// above
 		{ "type": "Block", "x": 6, "y": 16, "w": 42, "h": 2 },
-		// { "type": "Block", "x": 42, "y": 18, "w": 6, "h": 6 },
+		{ "type": "Block", "x": 46, "y": 18, "w": 2, "h": 2 },
 		{ "type": "Block", "x": 24, "y": 18, "w": 6, "h": 6 },
-		{ "type": "Block", "x": 9, "y": 24, "w": 12, "h": 12 },
 	],
 	"spikes": [
 		{ "type": "DeadlyBlock", "x": 6, "y": 0, "w": 30, "h": 3 },
 		{ "type": "DeadlyBlock", "x": 44, "y": 0, "w": 10, "h": 3 },
 		{ "type": "DeadlyBlock", "x": 6, "y": 18, "w": 18, "h": 2 },
-		{ "type": "DeadlyBlock", "x": 30, "y": 18, "w": 18, "h": 2 },
+		{ "type": "DeadlyBlock", "x": 30, "y": 18, "w": 16, "h": 2 },
 	],
 	"special_objects": [
 		{ "type": "GameGoal", "x": 3, "y": 28 },
 		{ "type": "DashRefresher", "x": 22, "y": 8, "refresh_count": 1 },
 		{ "type": "BouncyBall", "x": 44, "y": 24 },
-		{ "type": "DashRefresher", "x": 22.5, "y": 23, "refresh_count": 2 },
-		{ "type": "DashRefresher", "x": 14, "y": 21.5, "refresh_count": 2 },
-		{ "type": "DashRefresher", "x": 7.5, "y": 22.5, "refresh_count": 2 },
+		{ "type": "DashRefresher", "x": 22.5, "y": 26, "refresh_count": 2 },
+		{ "type": "DashRefresher", "x": 22.5, "y": 29, "refresh_count": 2 },
+		{ "type": "DashRefresher", "x": 22.5, "y": 32, "refresh_count": 2 },
 	],
 	"camera_triggers": [
 		// left, right, low, high,

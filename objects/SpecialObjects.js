@@ -231,8 +231,11 @@ class DashRefresher extends GameObject {
 			this.ready -= 1;
 			if (this.ready == 0) {
 				this.gameRoom.scene.add(this.box);
+				utils.play_effect('refresh');
 			}
 		}
+		this.box.rotation.x += 0.01
+		this.box.rotation.y += 0.01
 	}
 	onRender() {
 		this.box.position.x = this.position.x;
@@ -254,6 +257,7 @@ class DashRefresher extends GameObject {
 					player.dash_count = this.refresh_count;
 					this.ready = 180;
 					this.gameRoom.scene.remove(this.box);
+					utils.play_effect('crystal');
 				}
 			}
 		}

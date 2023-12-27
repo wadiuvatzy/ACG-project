@@ -15,7 +15,7 @@ BG.position.z = -50;
 
 export const lv_Tutorial_hard1 = {
 	"player": {
-		"x": 2,
+		"x": 0,
 		"y": 0,
 		"direction": 1
 	},

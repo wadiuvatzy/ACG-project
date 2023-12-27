@@ -77,13 +77,21 @@ export async function play_music(music_id) {
 const Effects = {
 	"jump": [],
 	"dash": [],
-	"pumber": []
+	"pumber": [],
+	"refresh": [],
+	"crystal": [],
 	// TODO
+	"crash": [],
+	"landing": []
 };
 const EffectsIter = {
 	"jump": 0,
 	"dash": 0,
-	"pumber": 0
+	"pumber": 0,
+	"refresh": 0,
+	"crystal": 0,
+	"crash": 0,
+	"landing": 0
 };
 
 const MAX_EFFECTS = 5;
@@ -115,11 +123,30 @@ audioLoader.load('audio/effects/pumber.mp3', function (buffer) {
 		Effects.pumber.push(audio);
 	}
 });
+audioLoader.load('audio/effects/crystal.mp3', function (buffer) {
+	for (let i = 0; i < MAX_EFFECTS; i++) {
+		const audio = new THREE.Audio(listener);
+		audio.setBuffer(buffer);
+		audio.setLoop(false);
+		audio.setVolume(0.5);
+		Effects.crystal.push(audio);
+	}
+});
+audioLoader.load('audio/effects/refresh.mp3', function (buffer) {
+	for (let i = 0; i < MAX_EFFECTS; i++) {
+		const audio = new THREE.Audio(listener);
+		audio.setBuffer(buffer);
+		audio.setLoop(false);
+		audio.setVolume(0.5);
+		Effects.refresh.push(audio);
+	}
+});
 
-export function play_effect(effect_id) {
+export function play_effect(effect_id, volume = 0.5) {
 	let audio = Effects[effect_id][EffectsIter[effect_id]];
 	if (audio.isPlaying)
 		audio.stop();
+	audio.setVolume(volume);
 	audio.play();
 	EffectsIter[effect_id] = EffectsIter[effect_id] + 1;
 	if (EffectsIter[effect_id] >= MAX_EFFECTS)
