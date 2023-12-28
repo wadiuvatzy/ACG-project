@@ -1,5 +1,6 @@
 import { GameObject, GRAVITY } from '../objects';
 import * as THREE from 'three';
+import * as utils from '../utils';
 
 export const BLOCK_UNIT_SIZE = 8;
 export const BLOCK_NORMAL = 0;
@@ -73,7 +74,7 @@ class Block extends GameObject {
 // TODO: add other blocks
 // DropBlock: when the player stands on it, it drops.
 // WeakBlock: breaks after the player touches it / the player dashes to it / a DropBlock drops on it, depending its type.
-
+const DropBlockTexture = textureLoader.load('textures/block_dropable.png');
 class DropBlock extends Block {
 	constructor(gameRoom, initial_position, width, height) {
 		super(gameRoom, initial_position, width, height);
@@ -81,7 +82,29 @@ class DropBlock extends Block {
 		this.type = BLOCK_DROP;
 
 		// Initialize the 3D object and its tiles.
-		this.box.material = new THREE.MeshStandardMaterial({ color: 0xffff00 });
+		const texture_front = DropBlockTexture.clone();
+		const texture_top = DropBlockTexture.clone();
+		const texture_side = DropBlockTexture.clone();
+		texture_front.repeat.set(width / BLOCK_UNIT_SIZE, height / BLOCK_UNIT_SIZE);
+		texture_front.wrapS = THREE.RepeatWrapping;
+		texture_front.wrapT = THREE.RepeatWrapping;
+		texture_front.needsUpdate = true;
+		texture_top.repeat.set(width / BLOCK_UNIT_SIZE, 5);
+		texture_top.rotation = Math.PI;
+		texture_top.wrapS = THREE.RepeatWrapping;
+		texture_top.wrapT = THREE.RepeatWrapping;
+		texture_side.repeat.set(5, height / BLOCK_UNIT_SIZE);
+		texture_side.wrapS = THREE.RepeatWrapping;
+		texture_side.wrapT = THREE.RepeatWrapping;
+		const material = [
+			new THREE.MeshStandardMaterial({ map: texture_side }),
+			new THREE.MeshStandardMaterial({ map: texture_side }),
+			new THREE.MeshStandardMaterial({ map: texture_top }),
+			new THREE.MeshStandardMaterial({ map: texture_top }),
+			new THREE.MeshStandardMaterial({ map: texture_front }),
+			new THREE.MeshStandardMaterial({ map: texture_front }),
+		];
+		this.box.material = material;
 	}
 	reset() {
 		this.position = this.initial_position.clone();
@@ -89,6 +112,7 @@ class DropBlock extends Block {
 		this.velocity = new THREE.Vector2(0, 0);
 		this.drop_timer = -1;  // -1 means not triggered, positive means triggered but not dropped, and 0 means dropping.
 		this.offset = new THREE.Vector2(0, 0);
+		this.landed = false;
 	}
 	onStep() {
 		this.previous_position = this.position.clone();
@@ -124,7 +148,13 @@ class DropBlock extends Block {
 				this.velocity.y = reset_to;
 				if (target_block.type == BLOCK_WEAK)
 					target_block.Breaks();
+				else {
+					if (!this.landed)
+						utils.play_effect("landing");
+					this.landed = true;
+				}
 			}
+			else this.landed = false;
 		}
 		else if (this.drop_timer > 0) {
 			if (this.drop_timer % 5 == 0) {
@@ -141,8 +171,10 @@ class DropBlock extends Block {
 	playerInteraction(player) {
 		var player_is_on = (player.standing_on == this);
 		if (this.drop_timer == -1) {
-			if (player_is_on)
+			if (player_is_on) {
 				this.drop_timer = 40;
+				utils.play_effect("weak");
+			}
 		}
 		else {
 			if (!player_is_on)
@@ -160,6 +192,7 @@ class DropBlock extends Block {
 	}
 }
 
+const WeakBlockTexture = textureLoader.load('textures/block_weak.png');
 class WeakBlock extends Block {
 	constructor(gameRoom, initial_position, width, height) {
 		super(gameRoom, initial_position, width, height);
@@ -167,7 +200,29 @@ class WeakBlock extends Block {
 		this.type = BLOCK_WEAK;
 
 		// Initialize the 3D object and its tiles.
-		this.box.material = new THREE.MeshStandardMaterial({ color: 0x008f00 });
+		const texture_front = WeakBlockTexture.clone();
+		const texture_top = WeakBlockTexture.clone();
+		const texture_side = WeakBlockTexture.clone();
+		texture_front.repeat.set(width / BLOCK_UNIT_SIZE, height / BLOCK_UNIT_SIZE);
+		texture_front.wrapS = THREE.RepeatWrapping;
+		texture_front.wrapT = THREE.RepeatWrapping;
+		texture_front.needsUpdate = true;
+		texture_top.repeat.set(width / BLOCK_UNIT_SIZE, 5);
+		texture_top.rotation = Math.PI;
+		texture_top.wrapS = THREE.RepeatWrapping;
+		texture_top.wrapT = THREE.RepeatWrapping;
+		texture_side.repeat.set(5, height / BLOCK_UNIT_SIZE);
+		texture_side.wrapS = THREE.RepeatWrapping;
+		texture_side.wrapT = THREE.RepeatWrapping;
+		const material = [
+			new THREE.MeshStandardMaterial({ map: texture_side }),
+			new THREE.MeshStandardMaterial({ map: texture_side }),
+			new THREE.MeshStandardMaterial({ map: texture_top }),
+			new THREE.MeshStandardMaterial({ map: texture_top }),
+			new THREE.MeshStandardMaterial({ map: texture_front }),
+			new THREE.MeshStandardMaterial({ map: texture_front }),
+		];
+		this.box.material = material;
 	}
 	reset() {
 		this.position = this.initial_position.clone();
@@ -184,6 +239,7 @@ class WeakBlock extends Block {
 		this.position.x = -300 * BLOCK_UNIT_SIZE;
 		this.position.y = -300 * BLOCK_UNIT_SIZE;
 		this.previous_position = this.position.clone();
+		utils.play_effect("break");
 	}
 	playerInteraction(player) {
 		if (player.dash_time_remains <= 0)
@@ -222,7 +278,7 @@ class WeakBlock extends Block {
 	}
 }
 
-
+const ShakingBlockTexture = textureLoader.load('textures/block_shaking.png');
 class ShakingBlock extends Block {
 	constructor(gameRoom, initial_position, target_position, width, height) {
 		super(gameRoom, initial_position, width, height);
@@ -231,7 +287,29 @@ class ShakingBlock extends Block {
 		this.type = BLOCK_MOVABLE;
 
 		// Initialize the 3D object and its tiles.
-		this.box.material = new THREE.MeshStandardMaterial({ color: 0x00ffff });
+		const texture_front = ShakingBlockTexture.clone();
+		const texture_top = ShakingBlockTexture.clone();
+		const texture_side = ShakingBlockTexture.clone();
+		texture_front.repeat.set(width / BLOCK_UNIT_SIZE, height / BLOCK_UNIT_SIZE);
+		texture_front.wrapS = THREE.RepeatWrapping;
+		texture_front.wrapT = THREE.RepeatWrapping;
+		texture_front.needsUpdate = true;
+		texture_top.repeat.set(width / BLOCK_UNIT_SIZE, 5);
+		texture_top.rotation = Math.PI;
+		texture_top.wrapS = THREE.RepeatWrapping;
+		texture_top.wrapT = THREE.RepeatWrapping;
+		texture_side.repeat.set(5, height / BLOCK_UNIT_SIZE);
+		texture_side.wrapS = THREE.RepeatWrapping;
+		texture_side.wrapT = THREE.RepeatWrapping;
+		const material = [
+			new THREE.MeshStandardMaterial({ map: texture_side }),
+			new THREE.MeshStandardMaterial({ map: texture_side }),
+			new THREE.MeshStandardMaterial({ map: texture_top }),
+			new THREE.MeshStandardMaterial({ map: texture_top }),
+			new THREE.MeshStandardMaterial({ map: texture_front }),
+			new THREE.MeshStandardMaterial({ map: texture_front }),
+		];
+		this.box.material = material;
 
 		this.timer = 0;
 		this.mode = 0;

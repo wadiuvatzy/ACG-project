@@ -81,8 +81,9 @@ const Effects = {
 	"refresh": [],
 	"crystal": [],
 	// TODO
-	"crash": [],
-	"landing": []
+	"break": [],
+	"landing": [],
+	"weak": [],
 };
 const EffectsIter = {
 	"jump": 0,
@@ -90,8 +91,9 @@ const EffectsIter = {
 	"pumber": 0,
 	"refresh": 0,
 	"crystal": 0,
-	"crash": 0,
-	"landing": 0
+	"break": 0,
+	"landing": 0,
+	"weak": 0,
 };
 
 const MAX_EFFECTS = 5;
@@ -140,6 +142,36 @@ audioLoader.load('audio/effects/refresh.mp3', function (buffer) {
 		audio.setVolume(0.5);
 		Effects.refresh.push(audio);
 	}
+});
+audioLoader.load('audio/effects/break.mp3', function (buffer) {
+	for (let i = 0; i < MAX_EFFECTS; i++) {
+		const audio = new THREE.Audio(listener);
+		audio.setBuffer(buffer);
+		audio.setLoop(false);
+		audio.setVolume(0.5);
+		Effects.break.push(audio);
+	}
+	window.alert("success?");
+});
+audioLoader.load('audio/effects/landing.mp3', function (buffer) {
+	for (let i = 0; i < MAX_EFFECTS; i++) {
+		const audio = new THREE.Audio(listener);
+		audio.setBuffer(buffer);
+		audio.setLoop(false);
+		audio.setVolume(0.5);
+		Effects.landing.push(audio);
+	}
+	window.alert("success??");
+});
+audioLoader.load('audio/effects/weak.mp3', function (buffer) {
+	for (let i = 0; i < MAX_EFFECTS; i++) {
+		const audio = new THREE.Audio(listener);
+		audio.setBuffer(buffer);
+		audio.setLoop(false);
+		audio.setVolume(0.5);
+		Effects.weak.push(audio);
+	}
+	window.alert("success???");
 });
 
 export function play_effect(effect_id, volume = 0.5) {
